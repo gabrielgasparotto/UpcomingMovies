@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
@@ -47,18 +48,22 @@ internal fun MovieDetailHeader(
                 model = movie.backdropPath?.let { "$BACKDROP_BASE_URL$it" },
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
-                modifier = Modifier.fillMaxWidth().height(200.dp)
+                modifier = Modifier
+                    .fillMaxSize()
                     .background(MaterialTheme.colorScheme.surfaceVariant),
             )
             Box(
-                modifier = Modifier.fillMaxWidth().height(200.dp).background(
+                modifier = Modifier.fillMaxSize().background(
                     Brush.verticalGradient(
                         colors = listOf(Color.Transparent, Color.Black.copy(alpha = 0.6f)),
                         startY = 80f,
                     )
                 )
             )
-            IconButton(onClick = onBackClick, modifier = Modifier.align(Alignment.TopStart).padding(4.dp)) {
+            IconButton(
+                onClick = onBackClick,
+                modifier = Modifier.align(Alignment.TopStart).padding(4.dp),
+            ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = "Back",

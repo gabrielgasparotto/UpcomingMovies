@@ -6,23 +6,23 @@ import java.util.Locale
 import java.util.concurrent.TimeUnit
 
 private val inputDateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.US)
-private val outputDateFormat = SimpleDateFormat("dd/MM/yyyy", Locale("pt", "BR"))
+private val outputDateFormat = SimpleDateFormat("dd/MMM/yyyy", Locale("pt", "BR"))
 
 internal fun String.formatToBrDate(): String = try {
-    outputDateFormat.format(inputDateFormat.parse(this)!!)
+    inputDateFormat.parse(this)?.let { outputDateFormat.format(it) } ?: this
 } catch (e: Exception) {
     this
 }
 
 internal fun String.daysUntilRelease(): Long = try {
-    val releaseDate = inputDateFormat.parse(this)!!.time
-    val today = Calendar.getInstance().apply {
+    val releaseMs = inputDateFormat.parse(this)?.time ?: return 0L
+    val todayMs = Calendar.getInstance().apply {
         set(Calendar.HOUR_OF_DAY, 0)
         set(Calendar.MINUTE, 0)
         set(Calendar.SECOND, 0)
         set(Calendar.MILLISECOND, 0)
     }.timeInMillis
-    TimeUnit.MILLISECONDS.toDays(releaseDate - today)
+    TimeUnit.MILLISECONDS.toDays(releaseMs - todayMs)
 } catch (e: Exception) {
     0L
 }

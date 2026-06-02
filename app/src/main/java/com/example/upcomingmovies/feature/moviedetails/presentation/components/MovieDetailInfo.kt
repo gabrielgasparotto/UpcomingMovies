@@ -35,7 +35,12 @@ internal fun MovieDetailInfo(
             modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp),
             horizontalArrangement = Arrangement.SpaceEvenly,
         ) {
-            InfoCell(label = "Rating", value = if (voteAverage == 0.0) "N/A" else "★ ${"%.1f".format(voteAverage)}\n(${voteCount})")
+            val hasRating = voteAverage != 0.0
+            InfoCell(
+                label = "Rating",
+                value = if (hasRating) "★ ${"%.1f".format(voteAverage)}\n($voteCount)" else "N/A",
+                isHighlighted = hasRating,
+            )
             InfoCell(label = "Runtime", value = runtime?.formatRuntime() ?: "N/A")
             InfoCell(label = "Release", value = releaseDate.formatToBrDate())
             InfoCell(label = "Status", value = status)
@@ -46,7 +51,12 @@ internal fun MovieDetailInfo(
 }
 
 @Composable
-private fun InfoCell(label: String, value: String, modifier: Modifier = Modifier) {
+private fun InfoCell(
+    label: String,
+    value: String,
+    modifier: Modifier = Modifier,
+    isHighlighted: Boolean = false,
+) {
     Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally) {
         Text(
             text = label,
@@ -58,7 +68,7 @@ private fun InfoCell(label: String, value: String, modifier: Modifier = Modifier
             style = MaterialTheme.typography.bodyMedium,
             fontWeight = FontWeight.SemiBold,
             textAlign = TextAlign.Center,
-            color = if (label == "Rating" && value != "N/A") Color(0xFFFFC107) else MaterialTheme.colorScheme.onSurface,
+            color = if (isHighlighted) Color(0xFFFFC107) else MaterialTheme.colorScheme.onSurface,
         )
     }
 }
