@@ -142,11 +142,11 @@ Each feature owns a single Koin module that wires its entire vertical slice:
 ```kotlin
 val movieListModule = module {
     // Database
-    single { Room.databaseBuilder(…).build() }
+    single { Room.databaseBuilder().build() }
     single { get<AppDatabase>().movieDao() }
     // Network
-    single { OkHttpClient.Builder()… }
-    single { Retrofit.Builder()… }
+    single { OkHttpClient.Builder() }
+    single { Retrofit.Builder() }
     single { get<Retrofit>().create(MovieService::class.java) }
     // Domain
     single<MovieRepository> { MovieRepositoryImpl(get(), get()) }
