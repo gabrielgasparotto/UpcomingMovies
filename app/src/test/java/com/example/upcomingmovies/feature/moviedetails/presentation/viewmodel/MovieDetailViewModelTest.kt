@@ -3,15 +3,22 @@ package com.example.upcomingmovies.feature.moviedetails.presentation.viewmodel
 import app.cash.turbine.test
 import com.example.upcomingmovies.feature.moviedetails.domain.model.MovieDetail
 import com.example.upcomingmovies.feature.moviedetails.domain.usecase.GetMovieDetailUseCase
+import com.example.upcomingmovies.feature.movielist.domain.usecase.ObserveHeartedIdsUseCase
+import com.example.upcomingmovies.feature.movielist.domain.usecase.ToggleHeartUseCase
 import com.example.upcomingmovies.utils.MainDispatcherRule
 import io.mockk.coEvery
+import io.mockk.coJustRun
 import io.mockk.coVerify
+import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
@@ -22,9 +29,23 @@ class MovieDetailViewModelTest {
     val mainDispatcherRule = MainDispatcherRule()
 
     private val getMovieDetailUseCase = mockk<GetMovieDetailUseCase>()
+    private val observeHeartedIdsUseCase = mockk<ObserveHeartedIdsUseCase>()
+    private val toggleHeartUseCase = mockk<ToggleHeartUseCase>()
+    private val heartIdsFlow = MutableStateFlow<Set<Int>>(emptySet())
     private val movieId = 11
 
-    private fun createViewModel() = MovieDetailViewModel(movieId, getMovieDetailUseCase)
+    @Before
+    fun setUp() {
+        every { observeHeartedIdsUseCase() } returns heartIdsFlow
+        coJustRun { toggleHeartUseCase(any()) }
+    }
+
+    private fun createViewModel() = MovieDetailViewModel(
+        movieId,
+        getMovieDetailUseCase,
+        toggleHeartUseCase,
+        observeHeartedIdsUseCase,
+    )
 
     // region initial state
 
@@ -59,10 +80,9 @@ class MovieDetailViewModelTest {
     }
 
     @Test
-    fun `loadDetail - failure - state becomes Error with message`() = runTest {
+    fun `loadDetail - failure - state becomes Error`() = runTest {
         // Given
-        val error = RuntimeException("Not found")
-        coEvery { getMovieDetailUseCase(movieId) } throws error
+        coEvery { getMovieDetailUseCase(movieId) } throws RuntimeException("Not found")
 
         // When
         val viewModel = createViewModel()
@@ -73,7 +93,7 @@ class MovieDetailViewModelTest {
     }
 
     @Test
-    fun `loadDetail - failure with null message - state becomes Error with null`() = runTest {
+    fun `loadDetail - failure with null message - state becomes Error`() = runTest {
         // Given
         coEvery { getMovieDetailUseCase(movieId) } throws RuntimeException()
 
@@ -89,11 +109,10 @@ class MovieDetailViewModelTest {
     fun `loadDetail - calls use case with correct movieId`() = runTest {
         // Given
         val specificId = 99
-        val detail = buildMovieDetail(id = specificId)
-        coEvery { getMovieDetailUseCase(specificId) } returns detail
+        coEvery { getMovieDetailUseCase(specificId) } returns buildMovieDetail(id = specificId)
+        MovieDetailViewModel(specificId, getMovieDetailUseCase, toggleHeartUseCase, observeHeartedIdsUseCase)
 
         // When
-        val viewModel = MovieDetailViewModel(specificId, getMovieDetailUseCase)
         advanceUntilIdle()
 
         // Then
@@ -115,8 +134,7 @@ class MovieDetailViewModelTest {
         val movieDetail = buildMovieDetail()
         coEvery { getMovieDetailUseCase(movieId) } returns movieDetail
 
-        // Then — observe Loading → Success via Turbine since _state.value = Loading
-        // is set inside the launched coroutine, not before it
+        // Then — observe Loading → Success via Turbine
         viewModel.state.test {
             assertEquals(MovieDetailState.Error, awaitItem())
             viewModel.onAction(MovieDetailAction.RetryLoad)
@@ -179,6 +197,68 @@ class MovieDetailViewModelTest {
         // Then
         assertEquals(stateBefore, viewModel.state.value)
         assertTrue(viewModel.state.value is MovieDetailState.Success)
+    }
+
+    // endregion
+
+    // region heart feature
+
+    @Test
+    fun `isHearted - initially false when movieId not in hearted ids`() = runTest {
+        // Given
+        coEvery { getMovieDetailUseCase(movieId) } returns buildMovieDetail()
+        val viewModel = createViewModel()
+        advanceUntilIdle()
+
+        // Then
+        assertFalse(viewModel.isHearted.value)
+    }
+
+    @Test
+    fun `isHearted - true when movieId is in hearted set`() = runTest {
+        // Given
+        coEvery { getMovieDetailUseCase(movieId) } returns buildMovieDetail()
+        val viewModel = createViewModel()
+        advanceUntilIdle()
+
+        // When
+        heartIdsFlow.value = setOf(movieId)
+        advanceUntilIdle()
+
+        // Then
+        assertTrue(viewModel.isHearted.value)
+    }
+
+    @Test
+    fun `isHearted - false when movieId removed from hearted set`() = runTest {
+        // Given — start hearted
+        coEvery { getMovieDetailUseCase(movieId) } returns buildMovieDetail()
+        heartIdsFlow.value = setOf(movieId)
+        val viewModel = createViewModel()
+        advanceUntilIdle()
+        assertTrue(viewModel.isHearted.value)
+
+        // When heart is removed
+        heartIdsFlow.value = emptySet()
+        advanceUntilIdle()
+
+        // Then
+        assertFalse(viewModel.isHearted.value)
+    }
+
+    @Test
+    fun `toggleHeart - action dispatched - calls toggleHeartUseCase with movieId`() = runTest {
+        // Given
+        coEvery { getMovieDetailUseCase(movieId) } returns buildMovieDetail()
+        val viewModel = createViewModel()
+        advanceUntilIdle()
+
+        // When
+        viewModel.onAction(MovieDetailAction.ToggleHeart)
+        advanceUntilIdle()
+
+        // Then
+        coVerify(exactly = 1) { toggleHeartUseCase(movieId) }
     }
 
     // endregion

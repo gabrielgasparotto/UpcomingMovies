@@ -1,6 +1,6 @@
 # Upcoming Movies
 
-An Android application that displays upcoming movies fetched from [The Movie Database (TMDB) API](https://www.themoviedb.org/), with offline support via local caching and a detail screen for each movie.
+An Android application that displays upcoming movies fetched from [The Movie Database (TMDB) API](https://www.themoviedb.org/), with offline support via local caching, a detail screen for each movie, and a favorites system.
 
 <video src="https://github.com/user-attachments/assets/bd16d386-dba7-4cac-b60d-ced002befeb4" autoplay loop muted playsinline></video>
 
@@ -13,6 +13,7 @@ The app allows users to:
 - See the movie poster, title, release date, and rating at a glance.
 - Identify unreleased movies with a dynamic countdown ("Release in X days").
 - Tap a movie to open a detail screen with backdrop, tagline, genres, overview, runtime, and status.
+- Heart a movie from the detail screen — hearted movies float to the top of the list with a visible heart indicator.
 - Use the app offline — the list is cached locally and served from the database while a background refresh runs.
 
 ---
@@ -58,6 +59,25 @@ The dependency rule flows inward: Presentation and Data both depend on Domain, b
 
 ---
 
+## Features
+
+### Movie list
+Movies are fetched from the TMDB API and cached in a local Room database. The list is always served from the database; a background refresh runs on every launch and on manual retry. Each item shows the poster, title, release date, and either a star rating or a release countdown for unreleased movies.
+
+### Heart / Favorites
+Heart state is stored in a separate `hearted_movies` Room table (movie IDs only), isolated from the movie cache so it survives schema migrations and network refreshes.
+
+- **Toggle from the detail screen** — a heart button sits in the top-right corner of the backdrop image. It is white when not hearted, pink when hearted.
+- **Visible in the list** — each list item shows a small heart icon as a read-only indicator. Hearted movies are automatically sorted to the top.
+- **Reactive** — both screens observe the same `HeartRepository` flow. Toggling from detail is immediately reflected in the list without any manual refresh.
+
+```
+HeartDao ──► HeartRepositoryImpl ──► ObserveHeartedIdsUseCase ──► MovieListViewModel (sort)
+                                  └──► ToggleHeartUseCase     ──► MovieDetailViewModel (toggle)
+```
+
+---
+
 ## Component pattern
 
 Every UI component follows a four-part pattern:
@@ -77,7 +97,7 @@ components/
 ├── loading/
 │   └── LoadingComponent.kt
 ├── movieitem/
-│   ├── MovieItemComponent.kt       # resolves MovieStatus (Rated / ReleaseStatus)
+│   ├── MovieItemComponent.kt       # resolves MovieStatus (Rated / ReleaseStatus), heart indicator
 │   └── MovieItemPreviewProvider.kt
 └── movielist/
     ├── MovieListComponent.kt
@@ -95,17 +115,23 @@ Dependencies: **JUnit 4 · MockK · kotlinx-coroutines-test · Turbine**
 | File | What it covers |
 |---|---|
 | `DateExtensionsTest` | `formatToDefaultDate`, `daysUntilRelease` — valid input, invalid format, past/future |
-| `MovieMapperTest` | `MovieDto → MovieEntity → Movie` round-trip, null poster path |
+| `MovieMapperTest` | `MovieDto → MovieEntity → Movie` round-trip, null poster path, `voteCount` mapping |
 | `MovieDetailMapperTest` | `MovieDetailDto → MovieDetail`, genres list, null runtime/paths |
+| `TmdbImageConfigTest` | URL constants, `posterSmallUrl` / `posterLargeUrl` / `backdropUrl` with null and non-null paths |
+| `NetworkModuleTest` | Auth interceptor adds `Authorization` and `Accept` headers, preserves URL/method, interceptor count per build type, Retrofit base URL, shared `OkHttpClient` instance |
 | `ObserveMoviesUseCaseTest` | Delegates to repository, returns exact flow |
 | `RefreshMoviesUseCaseTest` | Delegates to repository, propagates exception |
 | `GetMovieDetailUseCaseTest` | Delegates with correct ID, propagates exception |
-| `MovieRepositoryImplTest` | Flow mapping, empty list, multi-entity, refresh upserts, service error |
+| `ObserveHeartedIdsUseCaseTest` | Delegates to `HeartRepository.observeHeartedIds` |
+| `ToggleHeartUseCaseTest` | Delegates to `HeartRepository.toggleHeart` with correct ID |
+| `MovieRepositoryImplTest` | Flow mapping, empty list, multi-entity, refresh upserts, `voteCount` assertion |
 | `MovieDetailRepositoryImplTest` | Maps correctly, null runtime, service error |
-| `MovieListViewModelTest` | All state transitions: Loading → Success / Empty / Error, error suppression on Success, RetryLoad, Refresh |
-| `MovieDetailViewModelTest` | Loading → Success / Error, null message, RetryLoad sequence, NavigateBack no-op |
+| `HeartRepositoryImplTest` | `observeHeartedIds` maps list to `Set`, deduplicates; `toggleHeart` inserts when not hearted, deletes when hearted |
+| `MovieListViewModelTest` | State transitions: Loading → Success / Empty / Error, error suppression on Success, RetryLoad, Refresh; hearted movies sorted first, heart removed restores order |
+| `MovieDetailViewModelTest` | Loading → Success / Error, RetryLoad sequence, NavigateBack no-op; `isHearted` reflects flow, `ToggleHeart` action calls use case |
+| `KoinModulesTest` | `networkModule`, `movieListModule`, `movieDetailModule` — all bindings resolve |
 
-ViewModels are tested with `MainDispatcherRule` (replaces `Dispatchers.Main` with `StandardTestDispatcher`) and `MutableSharedFlow` to drive the observe stream.
+ViewModels are tested with `MainDispatcherRule` (replaces `Dispatchers.Main` with `StandardTestDispatcher`). `MutableSharedFlow` drives the movie stream; `MutableStateFlow<Set<Int>>(emptySet())` drives the heart stream so `combine` emits as soon as movies arrive.
 
 ### Instrumented tests — `src/androidTest/`
 
@@ -121,5 +147,6 @@ Dependencies: **Compose UI Test (ui-test-junit4 · ui-test-manifest)**
 | `MovieDetailInfoComponentTest` | All info cell labels, rating value, N/A for unrated, runtime formatting (h/m and m-only), null runtime, date and status |
 | `MovieDetailHeaderComponentTest` | Title, quoted tagline, blank tagline hidden, back button visible and clickable |
 | `MovieDaoTest` | Empty DB, insert and observe, `ORDER BY releaseDate DESC` sort, `voteAverage DESC` tiebreak, `REPLACE` conflict strategy, batch insert, empty upsert |
+| `HeartDaoTest` | Empty table, insert and observe, delete removes ID, `EXISTS` query, duplicate insert ignored (`IGNORE` strategy) |
 
-`MovieDaoTest` uses `Room.inMemoryDatabaseBuilder` with `allowMainThreadQueries()` to test real SQL query behaviour including ordering and conflict resolution.
+`MovieDaoTest` and `HeartDaoTest` both use `Room.inMemoryDatabaseBuilder` with `allowMainThreadQueries()` to test real SQL behaviour.

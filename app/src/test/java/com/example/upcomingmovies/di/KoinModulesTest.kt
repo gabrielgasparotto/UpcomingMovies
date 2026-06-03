@@ -7,6 +7,8 @@ import com.example.upcomingmovies.feature.movielist.di.movieListModule
 import org.junit.Test
 import org.koin.core.annotation.KoinExperimentalAPI
 import org.koin.test.verify.verify
+import com.example.upcomingmovies.feature.movielist.domain.usecase.ObserveHeartedIdsUseCase
+import com.example.upcomingmovies.feature.movielist.domain.usecase.ToggleHeartUseCase
 import retrofit2.Retrofit
 
 @OptIn(KoinExperimentalAPI::class)
@@ -25,7 +27,9 @@ class KoinModulesTest {
 
     @Test
     fun `movieDetailModule - all bindings can be resolved`() {
-        // Retrofit is provided at runtime by networkModule — declared as extraType here
-        movieDetailModule.verify(extraTypes = listOf(Retrofit::class))
+        // Retrofit, ObserveHeartedIdsUseCase, ToggleHeartUseCase come from movieListModule at runtime
+        movieDetailModule.verify(
+            extraTypes = listOf(Retrofit::class, ObserveHeartedIdsUseCase::class, ToggleHeartUseCase::class),
+        )
     }
 }

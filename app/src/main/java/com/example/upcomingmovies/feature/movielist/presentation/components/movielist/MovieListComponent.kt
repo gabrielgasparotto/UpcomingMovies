@@ -40,7 +40,12 @@ private fun MovieListComponentContent(
         contentPadding = PaddingValues(vertical = 8.dp),
     ) {
         items(movies, key = { it.id }) { movie ->
-            MovieItemComponent(params = MovieItemParams(movie = movie, onClick = { onMovieClick(movie.id) }))
+            MovieItemComponent(
+                params = MovieItemParams(
+                    movie = movie,
+                    onClick = { onMovieClick(movie.id) },
+                )
+            )
             HorizontalDivider()
         }
     }

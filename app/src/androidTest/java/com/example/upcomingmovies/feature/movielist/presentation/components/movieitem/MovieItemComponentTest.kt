@@ -99,6 +99,20 @@ class MovieItemComponentTest {
     }
 
     @Test
+    fun movieItemComponent_heartedMovie_rendersTitle() {
+        // Given — isHearted = true should not break the layout
+        val movie = buildRatedMovie().copy(isHearted = true)
+        rule.setContent {
+            MaterialTheme {
+                MovieItemComponent(params = MovieItemParams(movie = movie, onClick = {}))
+            }
+        }
+
+        // Then
+        rule.onNodeWithText(movie.title).assertIsDisplayed()
+    }
+
+    @Test
     fun movieItemComponent_clicking_invokesOnClick() {
         // Given
         var clicked = false

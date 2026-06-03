@@ -11,6 +11,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -26,15 +29,16 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.example.upcomingmovies.R
-import com.example.upcomingmovies.feature.core.presentation.TmdbImageConfig
 import com.example.upcomingmovies.feature.core.domain.ComponentPreview
 import com.example.upcomingmovies.feature.core.domain.daysUntilRelease
 import com.example.upcomingmovies.feature.core.domain.formatToDefaultDate
+import com.example.upcomingmovies.feature.core.presentation.TmdbImageConfig
 import com.example.upcomingmovies.feature.movielist.domain.model.Movie
 import java.util.Locale
 
 private const val ONE_DAY = 1L
 private const val TODAY = 0L
+private val HeartedColor = Color(0xFFE91E63)
 
 private sealed interface MovieStatus {
     data class Rated(val rating: String) : MovieStatus
@@ -66,6 +70,7 @@ internal fun MovieItemComponent(params: MovieItemParams, modifier: Modifier = Mo
         title = movie.title,
         releaseDate = movie.releaseDate.formatToDefaultDate(),
         status = status,
+        isHearted = movie.isHearted,
         onClick = params.onClick,
         modifier = modifier,
     )
@@ -77,6 +82,7 @@ private fun MovieItemComponentContent(
     title: String,
     releaseDate: String,
     status: MovieStatus,
+    isHearted: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -135,6 +141,16 @@ private fun MovieItemComponentContent(
                 )
             }
         }
+
+        Icon(
+            imageVector = Icons.Filled.Favorite,
+            contentDescription = null,
+            tint = if (isHearted) HeartedColor
+                   else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.2f),
+            modifier = Modifier
+                .padding(start = 8.dp)
+                .size(20.dp),
+        )
     }
 }
 

@@ -13,5 +13,5 @@ val movieDetailModule = module {
     single { get<Retrofit>().create(MovieDetailService::class.java) }
     single<MovieDetailRepository> { MovieDetailRepositoryImpl(get()) }
     factory { GetMovieDetailUseCase(get()) }
-    viewModel { params -> MovieDetailViewModel(params.get(), get()) }
+    viewModel { params -> MovieDetailViewModel(params.get(), get(), get(), get()) }
 }

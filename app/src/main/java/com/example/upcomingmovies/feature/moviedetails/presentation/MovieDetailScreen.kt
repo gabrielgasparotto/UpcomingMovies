@@ -41,9 +41,11 @@ fun MovieDetailRoute(
 ) {
     val viewModel: MovieDetailViewModel = koinViewModel(parameters = { parametersOf(movieId) })
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val isHearted by viewModel.isHearted.collectAsStateWithLifecycle()
 
     MovieDetailScreen(
         state = state,
+        isHearted = isHearted,
         onAction = { action ->
             if (action == MovieDetailAction.NavigateBack) onBackClick()
             else viewModel.onAction(action)
@@ -55,6 +57,7 @@ fun MovieDetailRoute(
 @Composable
 internal fun MovieDetailScreen(
     state: MovieDetailState,
+    isHearted: Boolean,
     onAction: (MovieDetailAction) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -63,7 +66,9 @@ internal fun MovieDetailScreen(
             is MovieDetailState.Loading -> LoadingComponent(Modifier.padding(innerPadding))
             is MovieDetailState.Success -> MovieDetailContent(
                 movie = state.movie,
+                isHearted = isHearted,
                 onBackClick = { onAction(MovieDetailAction.NavigateBack) },
+                onHeartClick = { onAction(MovieDetailAction.ToggleHeart) },
                 modifier = Modifier.padding(innerPadding),
             )
             is MovieDetailState.Error -> ErrorComponent(
@@ -81,13 +86,20 @@ internal fun MovieDetailScreen(
 @Composable
 private fun MovieDetailContent(
     movie: MovieDetail,
+    isHearted: Boolean,
     onBackClick: () -> Unit,
+    onHeartClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     LazyColumn(modifier = modifier.fillMaxSize()) {
         item {
             MovieDetailHeaderComponent(
-                params = MovieDetailHeaderParams(movie = movie, onBackClick = onBackClick),
+                params = MovieDetailHeaderParams(
+                    movie = movie,
+                    isHearted = isHearted,
+                    onBackClick = onBackClick,
+                    onHeartClick = onHeartClick,
+                ),
             )
         }
         item {
@@ -134,6 +146,6 @@ private fun MovieDetailScreenPreview(
     @PreviewParameter(MovieDetailStatePreviewProvider::class) state: MovieDetailState,
 ) {
     MaterialTheme {
-        MovieDetailScreen(state = state, onAction = {})
+        MovieDetailScreen(state = state, isHearted = false, onAction = {})
     }
 }

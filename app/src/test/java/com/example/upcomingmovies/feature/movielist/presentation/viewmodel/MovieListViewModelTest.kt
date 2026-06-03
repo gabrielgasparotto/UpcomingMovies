@@ -1,6 +1,7 @@
 package com.example.upcomingmovies.feature.movielist.presentation.viewmodel
 
 import com.example.upcomingmovies.feature.movielist.domain.model.Movie
+import com.example.upcomingmovies.feature.movielist.domain.usecase.ObserveHeartedIdsUseCase
 import com.example.upcomingmovies.feature.movielist.domain.usecase.ObserveMoviesUseCase
 import com.example.upcomingmovies.feature.movielist.domain.usecase.RefreshMoviesUseCase
 import com.example.upcomingmovies.utils.MainDispatcherRule
@@ -10,9 +11,11 @@ import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -25,15 +28,24 @@ class MovieListViewModelTest {
 
     private val observeMoviesUseCase = mockk<ObserveMoviesUseCase>()
     private val refreshMoviesUseCase = mockk<RefreshMoviesUseCase>()
+    private val observeHeartedIdsUseCase = mockk<ObserveHeartedIdsUseCase>()
+
     private val moviesFlow = MutableSharedFlow<List<Movie>>()
+    // StateFlow with initial value so combine emits as soon as moviesFlow emits
+    private val heartIdsFlow = MutableStateFlow<Set<Int>>(emptySet())
 
     @Before
     fun setUp() {
         every { observeMoviesUseCase() } returns moviesFlow
+        every { observeHeartedIdsUseCase() } returns heartIdsFlow
         coJustRun { refreshMoviesUseCase() }
     }
 
-    private fun createViewModel() = MovieListViewModel(observeMoviesUseCase, refreshMoviesUseCase)
+    private fun createViewModel() = MovieListViewModel(
+        observeMoviesUseCase,
+        refreshMoviesUseCase,
+        observeHeartedIdsUseCase,
+    )
 
     // region initial state
 
@@ -61,7 +73,7 @@ class MovieListViewModelTest {
         moviesFlow.emit(movies)
         advanceUntilIdle()
 
-        // Then
+        // Then — isHearted defaults to false, no reordering
         assertEquals(MovieListState.Success(movies), viewModel.state.value)
     }
 
@@ -138,10 +150,9 @@ class MovieListViewModelTest {
     // region refresh / error handling
 
     @Test
-    fun `refresh - fails while Loading - state becomes Error with message`() = runTest {
+    fun `refresh - fails while Loading - state becomes Error`() = runTest {
         // Given
-        val error = RuntimeException("Network error")
-        coEvery { refreshMoviesUseCase() } throws error
+        coEvery { refreshMoviesUseCase() } throws RuntimeException("Network error")
         val viewModel = createViewModel()
 
         // When
@@ -170,7 +181,7 @@ class MovieListViewModelTest {
     }
 
     @Test
-    fun `refresh - fails with null message - state becomes Error with null message`() = runTest {
+    fun `refresh - fails with null message - state becomes Error`() = runTest {
         // Given
         coEvery { refreshMoviesUseCase() } throws RuntimeException()
         val viewModel = createViewModel()
@@ -230,6 +241,68 @@ class MovieListViewModelTest {
 
         // Then — no crash and state unchanged (refresh succeeded, no movies emitted)
         assertEquals(MovieListState.Loading, viewModel.state.value)
+    }
+
+    // endregion
+
+    // region heart feature
+
+    @Test
+    fun `observeMovies - hearted id emitted - movie marked isHearted in Success state`() = runTest {
+        // Given
+        val movie = buildMovie(id = 1)
+        val viewModel = createViewModel()
+        advanceUntilIdle() // let the collect coroutine start
+        moviesFlow.emit(listOf(movie))
+        advanceUntilIdle()
+
+        // When heart flow emits id 1
+        heartIdsFlow.value = setOf(1)
+        advanceUntilIdle()
+
+        // Then
+        val state = viewModel.state.value as MovieListState.Success
+        assertTrue(state.movies.single().isHearted)
+    }
+
+    @Test
+    fun `observeMovies - hearted movies sorted first`() = runTest {
+        // Given — three movies, middle one will be hearted
+        val movies = listOf(buildMovie(id = 1), buildMovie(id = 2), buildMovie(id = 3))
+        val viewModel = createViewModel()
+        advanceUntilIdle() // let the collect coroutine start
+        moviesFlow.emit(movies)
+        advanceUntilIdle()
+
+        // When id=2 is hearted
+        heartIdsFlow.value = setOf(2)
+        advanceUntilIdle()
+
+        // Then — movie 2 is first
+        val state = viewModel.state.value as MovieListState.Success
+        assertEquals(2, state.movies.first().id)
+        assertTrue(state.movies.first().isHearted)
+    }
+
+    @Test
+    fun `observeMovies - heart removed - movie returns to original position`() = runTest {
+        // Given — movie 2 is initially hearted and therefore first
+        val movies = listOf(buildMovie(id = 1), buildMovie(id = 2), buildMovie(id = 3))
+        val viewModel = createViewModel()
+        advanceUntilIdle() // let the collect coroutine start
+        moviesFlow.emit(movies)
+        heartIdsFlow.value = setOf(2)
+        advanceUntilIdle()
+        assertEquals(2, (viewModel.state.value as MovieListState.Success).movies.first().id)
+
+        // When heart is removed
+        heartIdsFlow.value = emptySet()
+        advanceUntilIdle()
+
+        // Then — movies return to original order from the flow (1, 2, 3)
+        val state = viewModel.state.value as MovieListState.Success
+        assertEquals(listOf(1, 2, 3), state.movies.map { it.id })
+        assertTrue(state.movies.none { it.isHearted })
     }
 
     // endregion

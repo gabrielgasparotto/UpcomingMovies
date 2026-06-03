@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -33,13 +34,17 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.example.upcomingmovies.R
-import com.example.upcomingmovies.feature.core.presentation.TmdbImageConfig
 import com.example.upcomingmovies.feature.core.domain.ComponentPreview
+import com.example.upcomingmovies.feature.core.presentation.TmdbImageConfig
 import com.example.upcomingmovies.feature.moviedetails.domain.model.MovieDetail
+
+private val HeartedColor = Color(0xFFE91E63)
 
 internal data class MovieDetailHeaderParams(
     val movie: MovieDetail,
+    val isHearted: Boolean,
     val onBackClick: () -> Unit,
+    val onHeartClick: () -> Unit,
 )
 
 @Composable
@@ -49,7 +54,9 @@ internal fun MovieDetailHeaderComponent(params: MovieDetailHeaderParams, modifie
         posterUrl = TmdbImageConfig.posterLargeUrl(params.movie.posterPath),
         title = params.movie.title,
         tagline = params.movie.tagline.takeIf { it.isNotBlank() },
+        isHearted = params.isHearted,
         onBackClick = params.onBackClick,
+        onHeartClick = params.onHeartClick,
         modifier = modifier,
     )
 }
@@ -60,7 +67,9 @@ private fun MovieDetailHeaderComponentContent(
     posterUrl: String?,
     title: String,
     tagline: String?,
+    isHearted: Boolean,
     onBackClick: () -> Unit,
+    onHeartClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier) {
@@ -89,6 +98,19 @@ private fun MovieDetailHeaderComponentContent(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = stringResource(R.string.cd_navigate_back),
                     tint = Color.White,
+                )
+            }
+            IconButton(
+                onClick = onHeartClick,
+                modifier = Modifier.align(Alignment.TopEnd).padding(4.dp),
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Favorite,
+                    contentDescription = stringResource(
+                        if (isHearted) R.string.cd_remove_from_favorites
+                        else R.string.cd_add_to_favorites
+                    ),
+                    tint = if (isHearted) HeartedColor else Color.White.copy(alpha = 0.7f),
                 )
             }
         }

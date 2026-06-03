@@ -2,16 +2,19 @@ package com.example.upcomingmovies.feature.movielist.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.upcomingmovies.feature.movielist.domain.usecase.ObserveHeartedIdsUseCase
 import com.example.upcomingmovies.feature.movielist.domain.usecase.ObserveMoviesUseCase
 import com.example.upcomingmovies.feature.movielist.domain.usecase.RefreshMoviesUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 
 class MovieListViewModel(
     private val observeMoviesUseCase: ObserveMoviesUseCase,
     private val refreshMoviesUseCase: RefreshMoviesUseCase,
+    private val observeHeartedIdsUseCase: ObserveHeartedIdsUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow<MovieListState>(MovieListState.Loading)
@@ -34,7 +37,14 @@ class MovieListViewModel(
 
     private fun observeMovies() {
         viewModelScope.launch {
-            observeMoviesUseCase().collect { movies ->
+            combine(
+                observeMoviesUseCase(),
+                observeHeartedIdsUseCase(),
+            ) { movies, heartedIds ->
+                movies
+                    .map { it.copy(isHearted = it.id in heartedIds) }
+                    .sortedWith(compareByDescending { it.isHearted })
+            }.collect { movies ->
                 val current = _state.value
                 if (movies.isNotEmpty()) {
                     _state.value = MovieListState.Success(movies)
@@ -48,7 +58,7 @@ class MovieListViewModel(
     private fun refresh() {
         viewModelScope.launch {
             runCatching { refreshMoviesUseCase() }
-                .onFailure { error ->
+                .onFailure {
                     if (_state.value !is MovieListState.Success) {
                         _state.value = MovieListState.Error
                     }

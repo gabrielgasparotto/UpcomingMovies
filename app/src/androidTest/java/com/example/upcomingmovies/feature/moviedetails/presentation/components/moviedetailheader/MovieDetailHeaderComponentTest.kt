@@ -32,7 +32,7 @@ class MovieDetailHeaderComponentTest {
         rule.setContent {
             MaterialTheme {
                 MovieDetailHeaderComponent(
-                    params = MovieDetailHeaderParams(movie = buildMovieDetail(), onBackClick = {})
+                    params = MovieDetailHeaderParams(movie = buildMovieDetail(), isHearted = false, onBackClick = {}, onHeartClick = {})
                 )
             }
         }
@@ -48,7 +48,7 @@ class MovieDetailHeaderComponentTest {
         rule.setContent {
             MaterialTheme {
                 MovieDetailHeaderComponent(
-                    params = MovieDetailHeaderParams(movie = movie, onBackClick = {})
+                    params = MovieDetailHeaderParams(movie = movie, isHearted = false, onBackClick = {}, onHeartClick = {})
                 )
             }
         }
@@ -64,7 +64,7 @@ class MovieDetailHeaderComponentTest {
         rule.setContent {
             MaterialTheme {
                 MovieDetailHeaderComponent(
-                    params = MovieDetailHeaderParams(movie = movie, onBackClick = {})
+                    params = MovieDetailHeaderParams(movie = movie, isHearted = false, onBackClick = {}, onHeartClick = {})
                 )
             }
         }
@@ -79,7 +79,7 @@ class MovieDetailHeaderComponentTest {
         rule.setContent {
             MaterialTheme {
                 MovieDetailHeaderComponent(
-                    params = MovieDetailHeaderParams(movie = buildMovieDetail(), onBackClick = {})
+                    params = MovieDetailHeaderParams(movie = buildMovieDetail(), isHearted = false, onBackClick = {}, onHeartClick = {})
                 )
             }
         }
@@ -97,7 +97,9 @@ class MovieDetailHeaderComponentTest {
                 MovieDetailHeaderComponent(
                     params = MovieDetailHeaderParams(
                         movie = buildMovieDetail(),
+                        isHearted = false,
                         onBackClick = { backClicked = true },
+                        onHeartClick = {},
                     )
                 )
             }
@@ -108,6 +110,73 @@ class MovieDetailHeaderComponentTest {
 
         // Then
         rule.runOnIdle { assertTrue(backClicked) }
+    }
+
+    @Test
+    fun movieDetailHeaderComponent_notHearted_heartButtonShowsAddDescription() {
+        // Given
+        rule.setContent {
+            MaterialTheme {
+                MovieDetailHeaderComponent(
+                    params = MovieDetailHeaderParams(
+                        movie = buildMovieDetail(),
+                        isHearted = false,
+                        onBackClick = {},
+                        onHeartClick = {},
+                    )
+                )
+            }
+        }
+
+        // Then
+        rule.onNodeWithContentDescription(context.getString(R.string.cd_add_to_favorites))
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun movieDetailHeaderComponent_hearted_heartButtonShowsRemoveDescription() {
+        // Given
+        rule.setContent {
+            MaterialTheme {
+                MovieDetailHeaderComponent(
+                    params = MovieDetailHeaderParams(
+                        movie = buildMovieDetail(),
+                        isHearted = true,
+                        onBackClick = {},
+                        onHeartClick = {},
+                    )
+                )
+            }
+        }
+
+        // Then
+        rule.onNodeWithContentDescription(context.getString(R.string.cd_remove_from_favorites))
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun movieDetailHeaderComponent_clickingHeartButton_invokesCallback() {
+        // Given
+        var heartClicked = false
+        rule.setContent {
+            MaterialTheme {
+                MovieDetailHeaderComponent(
+                    params = MovieDetailHeaderParams(
+                        movie = buildMovieDetail(),
+                        isHearted = false,
+                        onBackClick = {},
+                        onHeartClick = { heartClicked = true },
+                    )
+                )
+            }
+        }
+
+        // When
+        rule.onNodeWithContentDescription(context.getString(R.string.cd_add_to_favorites))
+            .performClick()
+
+        // Then
+        rule.runOnIdle { assertTrue(heartClicked) }
     }
 }
 

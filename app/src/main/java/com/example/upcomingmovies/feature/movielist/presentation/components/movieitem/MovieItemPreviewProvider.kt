@@ -10,7 +10,7 @@ internal class MovieItemPreviewProvider : PreviewParameterProvider<MovieItemPara
             onClick = {},
         ),
         MovieItemParams(
-            movie = Movie(2, "Fast X", "Dom Toretto and his family face their deadliest foe.", "2099-01-01", "/jwMMQR69Xz9AYtX4u2uYJgfAAev.jpg", 0.0, 0),
+            movie = Movie(2, "Fast X", "Dom Toretto and his family face their deadliest foe.", "2099-01-01", "/jwMMQR69Xz9AYtX4u2uYJgfAAev.jpg", 0.0, 0, isHearted = true),
             onClick = {},
         ),
         MovieItemParams(
