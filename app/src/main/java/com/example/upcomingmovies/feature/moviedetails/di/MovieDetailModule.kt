@@ -5,7 +5,7 @@ import com.example.upcomingmovies.feature.moviedetails.data.repository.MovieDeta
 import com.example.upcomingmovies.feature.moviedetails.domain.repository.MovieDetailRepository
 import com.example.upcomingmovies.feature.moviedetails.domain.usecase.GetMovieDetailUseCase
 import com.example.upcomingmovies.feature.moviedetails.presentation.viewmodel.MovieDetailViewModel
-import org.koin.androidx.viewmodel.dsl.viewModel
+import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 import retrofit2.Retrofit
 
