@@ -1,5 +1,7 @@
 package com.example.upcomingmovies.feature.moviedetails.presentation
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
@@ -13,6 +15,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.example.upcomingmovies.feature.movielist.presentation.components.movielisttopbar.HeaderGradientColors
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.upcomingmovies.R
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -61,24 +64,32 @@ internal fun MovieDetailScreen(
     onAction: (MovieDetailAction) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Scaffold(modifier = modifier) { innerPadding ->
-        when (state) {
-            is MovieDetailState.Loading -> LoadingComponent(Modifier.padding(innerPadding))
-            is MovieDetailState.Success -> MovieDetailContent(
-                movie = state.movie,
-                isHearted = isHearted,
-                onBackClick = { onAction(MovieDetailAction.NavigateBack) },
-                onHeartClick = { onAction(MovieDetailAction.ToggleHeart) },
-                modifier = Modifier.padding(innerPadding),
-            )
-            is MovieDetailState.Error -> ErrorComponent(
-                params = ErrorComponentParams(
-                    message = stringResource(R.string.error_load_movie_details),
-                    onRetryText = stringResource(R.string.action_retry),
-                    onRetry = { onAction(MovieDetailAction.RetryLoad) },
-                ),
-                modifier = Modifier.padding(innerPadding),
-            )
+    Scaffold(
+        modifier = modifier,
+        containerColor = HeaderGradientColors.first(),
+    ) { innerPadding ->
+        Box(
+            modifier = Modifier
+                .padding(innerPadding)
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background),
+        ) {
+            when (state) {
+                is MovieDetailState.Loading -> LoadingComponent()
+                is MovieDetailState.Success -> MovieDetailContent(
+                    movie = state.movie,
+                    isHearted = isHearted,
+                    onBackClick = { onAction(MovieDetailAction.NavigateBack) },
+                    onHeartClick = { onAction(MovieDetailAction.ToggleHeart) },
+                )
+                is MovieDetailState.Error -> ErrorComponent(
+                    params = ErrorComponentParams(
+                        message = stringResource(R.string.error_load_movie_details),
+                        onRetryText = stringResource(R.string.action_retry),
+                        onRetry = { onAction(MovieDetailAction.RetryLoad) },
+                    ),
+                )
+            }
         }
     }
 }

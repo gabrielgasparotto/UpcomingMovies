@@ -3,6 +3,9 @@
 
     <!-- Movie list -->
     <string name="title_upcoming_movies">Upcoming Movies</string>
+    <string name="tab_all_movies">All Movies</string>
+    <string name="tab_favorites">Favorites</string>
+    <string name="error_no_favorites">No favorites yet.\nHeart a movie to save it here.</string>
     <string name="error_no_upcoming_movies">No upcoming movies available.</string>
     <string name="error_load_movies">Failed to load movies.</string>
     <string name="error_load_movie_details">Failed to load movie details.</string>

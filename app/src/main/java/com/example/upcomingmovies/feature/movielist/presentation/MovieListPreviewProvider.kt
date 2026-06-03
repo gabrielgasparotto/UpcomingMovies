@@ -3,6 +3,7 @@ package com.example.upcomingmovies.feature.movielist.presentation
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import com.example.upcomingmovies.feature.movielist.domain.model.Movie
 import com.example.upcomingmovies.feature.movielist.presentation.viewmodel.MovieListState
+import com.example.upcomingmovies.feature.movielist.presentation.viewmodel.MovieListTabContent
 
 internal val sampleMovies = listOf(
     Movie(1, "Evil Dead Rise", "Two sisters find an ancient vinyl...", "2023-04-12", null, 7.0, 1234),
@@ -13,7 +14,10 @@ internal val sampleMovies = listOf(
 class MovieListStatePreviewProvider : PreviewParameterProvider<MovieListState> {
     override val values = sequenceOf(
         MovieListState.Loading,
-        MovieListState.Success(sampleMovies),
+        MovieListState.Success(
+            allMoviesTab = MovieListTabContent.Movies(sampleMovies),
+            favoritesTab = MovieListTabContent.Empty,
+        ),
         MovieListState.Empty,
         MovieListState.Error,
     )

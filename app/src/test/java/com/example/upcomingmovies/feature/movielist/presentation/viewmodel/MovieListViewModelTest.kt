@@ -63,7 +63,7 @@ class MovieListViewModelTest {
     // region observeMovies
 
     @Test
-    fun `observeMovies - movies emitted - state becomes Success`() = runTest {
+    fun `observeMovies - movies emitted - state becomes Success with correct allMoviesTab`() = runTest {
         // Given
         val movies = listOf(buildMovie())
         val viewModel = createViewModel()
@@ -73,8 +73,12 @@ class MovieListViewModelTest {
         moviesFlow.emit(movies)
         advanceUntilIdle()
 
-        // Then — isHearted defaults to false, no reordering
-        assertEquals(MovieListState.Success(movies), viewModel.state.value)
+        // Then — allMoviesTab contains all movies, favoritesTab is Empty (no hearted movies)
+        val expected = MovieListState.Success(
+            allMoviesTab = MovieListTabContent.Movies(movies),
+            favoritesTab = MovieListTabContent.Empty,
+        )
+        assertEquals(expected, viewModel.state.value)
     }
 
     @Test
@@ -99,7 +103,11 @@ class MovieListViewModelTest {
         advanceUntilIdle()
         moviesFlow.emit(movies)
         advanceUntilIdle()
-        assertEquals(MovieListState.Success(movies), viewModel.state.value)
+        val expected = MovieListState.Success(
+            allMoviesTab = MovieListTabContent.Movies(movies),
+            favoritesTab = MovieListTabContent.Empty,
+        )
+        assertEquals(expected, viewModel.state.value)
 
         // When
         moviesFlow.emit(emptyList())
@@ -177,7 +185,11 @@ class MovieListViewModelTest {
         advanceUntilIdle()
 
         // Then — error is suppressed because state is Success
-        assertEquals(MovieListState.Success(movies), viewModel.state.value)
+        val expected = MovieListState.Success(
+            allMoviesTab = MovieListTabContent.Movies(movies),
+            favoritesTab = MovieListTabContent.Empty,
+        )
+        assertEquals(expected, viewModel.state.value)
     }
 
     @Test
@@ -248,7 +260,7 @@ class MovieListViewModelTest {
     // region heart feature
 
     @Test
-    fun `observeMovies - hearted id emitted - movie marked isHearted in Success state`() = runTest {
+    fun `observeMovies - hearted id emitted - movie marked isHearted in allMoviesTab`() = runTest {
         // Given
         val movie = buildMovie(id = 1)
         val viewModel = createViewModel()
@@ -262,15 +274,15 @@ class MovieListViewModelTest {
 
         // Then
         val state = viewModel.state.value as MovieListState.Success
-        assertTrue(state.movies.single().isHearted)
+        assertTrue(state.allMoviesTab.movies.single().isHearted)
     }
 
     @Test
-    fun `observeMovies - hearted movies sorted first`() = runTest {
+    fun `observeMovies - hearted id emitted - favoritesTab contains only hearted movie`() = runTest {
         // Given — three movies, middle one will be hearted
         val movies = listOf(buildMovie(id = 1), buildMovie(id = 2), buildMovie(id = 3))
         val viewModel = createViewModel()
-        advanceUntilIdle() // let the collect coroutine start
+        advanceUntilIdle()
         moviesFlow.emit(movies)
         advanceUntilIdle()
 
@@ -278,31 +290,106 @@ class MovieListViewModelTest {
         heartIdsFlow.value = setOf(2)
         advanceUntilIdle()
 
-        // Then — movie 2 is first
+        // Then — favoritesTab contains only movie 2
         val state = viewModel.state.value as MovieListState.Success
-        assertEquals(2, state.movies.first().id)
-        assertTrue(state.movies.first().isHearted)
+        val favoritesContent = state.favoritesTab as MovieListTabContent.Movies
+        assertEquals(listOf(2), favoritesContent.movies.map { it.id })
+        assertTrue(favoritesContent.movies.single().isHearted)
     }
 
     @Test
-    fun `observeMovies - heart removed - movie returns to original position`() = runTest {
-        // Given — movie 2 is initially hearted and therefore first
+    fun `observeMovies - original order preserved in allMoviesTab after hearting`() = runTest {
+        // Given — three movies
         val movies = listOf(buildMovie(id = 1), buildMovie(id = 2), buildMovie(id = 3))
         val viewModel = createViewModel()
-        advanceUntilIdle() // let the collect coroutine start
+        advanceUntilIdle()
+        moviesFlow.emit(movies)
+        advanceUntilIdle()
+
+        // When id=2 is hearted
+        heartIdsFlow.value = setOf(2)
+        advanceUntilIdle()
+
+        // Then — allMoviesTab preserves original order (1, 2, 3)
+        val state = viewModel.state.value as MovieListState.Success
+        assertEquals(listOf(1, 2, 3), state.allMoviesTab.movies.map { it.id })
+    }
+
+    @Test
+    fun `observeMovies - no hearted movies - favoritesTab is Empty`() = runTest {
+        // Given
+        val movies = listOf(buildMovie(id = 1), buildMovie(id = 2), buildMovie(id = 3))
+        val viewModel = createViewModel()
+        advanceUntilIdle()
+
+        // When
+        moviesFlow.emit(movies)
+        advanceUntilIdle()
+
+        // Then — favoritesTab is Empty because no movies are hearted
+        val state = viewModel.state.value as MovieListState.Success
+        assertEquals(MovieListTabContent.Empty, state.favoritesTab)
+    }
+
+    @Test
+    fun `observeMovies - some hearted movies - favoritesTab is Movies with filtered list`() = runTest {
+        // Given
+        val movies = listOf(buildMovie(id = 1), buildMovie(id = 2), buildMovie(id = 3))
+        val viewModel = createViewModel()
+        advanceUntilIdle()
+        moviesFlow.emit(movies)
+        advanceUntilIdle()
+
+        // When ids 1 and 3 are hearted
+        heartIdsFlow.value = setOf(1, 3)
+        advanceUntilIdle()
+
+        // Then — favoritesTab contains only movies 1 and 3
+        val state = viewModel.state.value as MovieListState.Success
+        val favoritesContent = state.favoritesTab as MovieListTabContent.Movies
+        assertEquals(listOf(1, 3), favoritesContent.movies.map { it.id })
+        assertTrue(favoritesContent.movies.all { it.isHearted })
+    }
+
+    @Test
+    fun `observeMovies - heart removed - favoritesTab becomes Empty`() = runTest {
+        // Given — movie 2 is initially hearted
+        val movies = listOf(buildMovie(id = 1), buildMovie(id = 2), buildMovie(id = 3))
+        val viewModel = createViewModel()
+        advanceUntilIdle()
         moviesFlow.emit(movies)
         heartIdsFlow.value = setOf(2)
         advanceUntilIdle()
-        assertEquals(2, (viewModel.state.value as MovieListState.Success).movies.first().id)
+        val stateAfterHeart = viewModel.state.value as MovieListState.Success
+        assertTrue(stateAfterHeart.favoritesTab is MovieListTabContent.Movies)
 
         // When heart is removed
         heartIdsFlow.value = emptySet()
         advanceUntilIdle()
 
-        // Then — movies return to original order from the flow (1, 2, 3)
+        // Then — favoritesTab becomes Empty
         val state = viewModel.state.value as MovieListState.Success
-        assertEquals(listOf(1, 2, 3), state.movies.map { it.id })
-        assertTrue(state.movies.none { it.isHearted })
+        assertEquals(MovieListTabContent.Empty, state.favoritesTab)
+    }
+
+    @Test
+    fun `observeMovies - heart removed - allMoviesTab restores original order`() = runTest {
+        // Given — movie 2 is initially hearted
+        val movies = listOf(buildMovie(id = 1), buildMovie(id = 2), buildMovie(id = 3))
+        val viewModel = createViewModel()
+        advanceUntilIdle()
+        moviesFlow.emit(movies)
+        heartIdsFlow.value = setOf(2)
+        advanceUntilIdle()
+
+        // When heart is removed
+        heartIdsFlow.value = emptySet()
+        advanceUntilIdle()
+
+        // Then — movies return to original order (1, 2, 3) and none are hearted
+        val state = viewModel.state.value as MovieListState.Success
+        assertEquals(listOf(1, 2, 3), state.allMoviesTab.movies.map { it.id })
+        assertTrue(state.allMoviesTab.movies.none { it.isHearted })
     }
 
     // endregion

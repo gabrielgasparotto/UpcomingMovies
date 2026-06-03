@@ -41,13 +41,16 @@ class MovieListViewModel(
                 observeMoviesUseCase(),
                 observeHeartedIdsUseCase(),
             ) { movies, heartedIds ->
-                movies
-                    .map { it.copy(isHearted = it.id in heartedIds) }
-                    .sortedWith(compareByDescending { it.isHearted })
+                movies.map { it.copy(isHearted = it.id in heartedIds) }
             }.collect { movies ->
                 val current = _state.value
                 if (movies.isNotEmpty()) {
-                    _state.value = MovieListState.Success(movies)
+                    val favorites = movies.filter { it.isHearted }
+                    _state.value = MovieListState.Success(
+                        allMoviesTab = MovieListTabContent.Movies(movies),
+                        favoritesTab = if (favorites.isEmpty()) MovieListTabContent.Empty
+                                       else MovieListTabContent.Movies(favorites),
+                    )
                 } else if (current is MovieListState.Success || current is MovieListState.Empty) {
                     _state.value = MovieListState.Empty
                 }

@@ -16,8 +16,8 @@ import com.example.upcomingmovies.feature.core.domain.ComponentPreview
 
 internal data class ErrorComponentParams(
     val message: String,
-    val onRetryText: String,
-    val onRetry: () -> Unit,
+    val onRetryText: String?,
+    val onRetry: (() -> Unit)?,
 )
 
 @Composable
@@ -33,14 +33,20 @@ internal fun ErrorComponent(params: ErrorComponentParams, modifier: Modifier = M
 @Composable
 private fun ErrorComponentContent(
     message: String,
-    onRetryText: String,
-    onRetry: () -> Unit,
     modifier: Modifier = Modifier,
+    onRetryText: String?,
+    onRetry: (() -> Unit)?,
 ) {
     Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(text = message, modifier = Modifier.padding(bottom = 16.dp))
-            Button(onClick = onRetry) { Text(onRetryText) }
+            Text(
+                text = message,
+                style = MaterialTheme.typography.bodyLarge,
+                modifier = Modifier.padding(bottom = 16.dp),
+            )
+            if (onRetry != null && onRetryText != null) {
+                Button(onClick = onRetry) { Text(onRetryText) }
+            }
         }
     }
 }

@@ -3,6 +3,7 @@ package com.example.upcomingmovies.feature.movielist.presentation.components.err
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -97,5 +98,45 @@ class ErrorComponentTest {
 
         // Then
         rule.onNodeWithText("Failed to load movies.").assertIsDisplayed()
+    }
+
+    @Test
+    fun errorComponent_nullOnRetry_retryButtonNotShown() {
+        // Given — both onRetry and onRetryText are null
+        rule.setContent {
+            MaterialTheme {
+                ErrorComponent(
+                    params = ErrorComponentParams(
+                        message = "No favorites yet.",
+                        onRetryText = null,
+                        onRetry = null,
+                    )
+                )
+            }
+        }
+
+        // Then — message is shown but no button
+        rule.onNodeWithText("No favorites yet.").assertIsDisplayed()
+        assertTrue(rule.onAllNodesWithText("Retry").fetchSemanticsNodes().isEmpty())
+    }
+
+    @Test
+    fun errorComponent_nullOnRetryWithText_retryButtonNotShown() {
+        // Given — onRetry is null even though onRetryText is provided
+        rule.setContent {
+            MaterialTheme {
+                ErrorComponent(
+                    params = ErrorComponentParams(
+                        message = "Something went wrong",
+                        onRetryText = "Retry",
+                        onRetry = null,
+                    )
+                )
+            }
+        }
+
+        // Then — message shown, button absent because onRetry is null
+        rule.onNodeWithText("Something went wrong").assertIsDisplayed()
+        assertTrue(rule.onAllNodesWithText("Retry").fetchSemanticsNodes().isEmpty())
     }
 }
