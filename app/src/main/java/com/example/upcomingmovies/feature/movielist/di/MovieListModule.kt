@@ -10,19 +10,16 @@ import com.example.upcomingmovies.feature.movielist.domain.usecase.RefreshMovies
 import com.example.upcomingmovies.feature.movielist.presentation.viewmodel.MovieListViewModel
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
+import com.example.upcomingmovies.BuildConfig
 import org.koin.android.ext.koin.androidContext
-import org.koin.androidx.viewmodel.dsl.viewModel
+import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 private const val TMDB_BASE_URL = "https://api.themoviedb.org/3/"
 
-// Replace with your TMDB API Read Access Token from https://www.themoviedb.org/settings/api
-private const val TMDB_ACCESS_TOKEN = "eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI1MTBjNDgxZTU1YWE1MmI2YTE2ZTIyODg1ZDNjNTBkNiIsIm5iZiI6MTc4MDQyMDU4Ni4yNTIsInN1YiI6IjZhMWYwZmVhZTNiM2UyNDY0YTBkMTk2MSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.kULTot1PtDDgQo8aPtYo6ZHPqzq7VEWIoa1-aCSKHTw"
-
 val movieListModule = module {
-    // Database
     single {
         Room.databaseBuilder(
             androidContext(),
@@ -31,8 +28,6 @@ val movieListModule = module {
         ).build()
     }
     single { get<AppDatabase>().movieDao() }
-
-    // Network
     single {
         OkHttpClient.Builder()
             .addInterceptor(
@@ -43,7 +38,7 @@ val movieListModule = module {
             .addInterceptor { chain ->
                 chain.proceed(
                     chain.request().newBuilder()
-                        .addHeader("Authorization", "Bearer $TMDB_ACCESS_TOKEN")
+                        .addHeader("Authorization", "Bearer ${BuildConfig.TMDB_ACCESS_TOKEN}")
                         .addHeader("Accept", "application/json")
                         .build()
                 )
@@ -58,12 +53,9 @@ val movieListModule = module {
             .build()
     }
     single { get<Retrofit>().create(MovieService::class.java) }
-
-    // Data
     single<MovieRepository> { MovieRepositoryImpl(get(), get()) }
     factory { ObserveMoviesUseCase(get()) }
     factory { RefreshMoviesUseCase(get()) }
 
-    // ViewModel
     viewModel { MovieListViewModel(get(), get()) }
 }
