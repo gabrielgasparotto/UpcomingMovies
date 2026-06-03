@@ -32,7 +32,11 @@ class MovieDetailHeaderComponentTest {
         rule.setContent {
             MaterialTheme {
                 MovieDetailHeaderComponent(
-                    params = MovieDetailHeaderParams(movie = buildMovieDetail(), isHearted = false, onBackClick = {}, onHeartClick = {})
+                    params = MovieDetailHeaderParams(
+                        movie = buildMovieDetail(),
+                        isHearted = false,
+                        onBackClick = {},
+                        onHeartClick = {})
                 )
             }
         }
@@ -48,7 +52,11 @@ class MovieDetailHeaderComponentTest {
         rule.setContent {
             MaterialTheme {
                 MovieDetailHeaderComponent(
-                    params = MovieDetailHeaderParams(movie = movie, isHearted = false, onBackClick = {}, onHeartClick = {})
+                    params = MovieDetailHeaderParams(
+                        movie = movie,
+                        isHearted = false,
+                        onBackClick = {},
+                        onHeartClick = {})
                 )
             }
         }
@@ -64,7 +72,11 @@ class MovieDetailHeaderComponentTest {
         rule.setContent {
             MaterialTheme {
                 MovieDetailHeaderComponent(
-                    params = MovieDetailHeaderParams(movie = movie, isHearted = false, onBackClick = {}, onHeartClick = {})
+                    params = MovieDetailHeaderParams(
+                        movie = movie,
+                        isHearted = false,
+                        onBackClick = {},
+                        onHeartClick = {})
                 )
             }
         }
@@ -79,13 +91,18 @@ class MovieDetailHeaderComponentTest {
         rule.setContent {
             MaterialTheme {
                 MovieDetailHeaderComponent(
-                    params = MovieDetailHeaderParams(movie = buildMovieDetail(), isHearted = false, onBackClick = {}, onHeartClick = {})
+                    params = MovieDetailHeaderParams(
+                        movie = buildMovieDetail(),
+                        isHearted = false,
+                        onBackClick = {},
+                        onHeartClick = {})
                 )
             }
         }
 
         // Then
-        rule.onNodeWithContentDescription(context.getString(R.string.cd_navigate_back)).assertIsDisplayed()
+        rule.onNodeWithContentDescription(context.getString(R.string.cd_navigate_back))
+            .assertIsDisplayed()
     }
 
     @Test
@@ -106,7 +123,8 @@ class MovieDetailHeaderComponentTest {
         }
 
         // When
-        rule.onNodeWithContentDescription(context.getString(R.string.cd_navigate_back)).performClick()
+        rule.onNodeWithContentDescription(context.getString(R.string.cd_navigate_back))
+            .performClick()
 
         // Then
         rule.runOnIdle { assertTrue(backClicked) }
