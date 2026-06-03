@@ -2,6 +2,8 @@
 
 An Android application that displays upcoming movies fetched from [The Movie Database (TMDB) API](https://www.themoviedb.org/), with offline support via local caching and a detail screen for each movie.
 
+https://github.com/user-attachments/assets/bd16d386-dba7-4cac-b60d-ced002befeb4
+
 ---
 
 ## Purpose
@@ -57,38 +59,6 @@ components/
     ├── MovieListComponent.kt
     └── MovieListPreviewProvider.kt
 ```
-
-The `moviedetails` feature follows the same layout under its own `components/` folder (`moviedetailheader/`, `moviedetailinfo/`, `moviedetailgenres/`).
-
-### MovieStatus
-
-`MovieItemComponent` uses a private sealed interface to make the rating / release-status distinction compile-safe:
-
-```kotlin
-private sealed interface MovieStatus {
-    data class Rated(val rating: String) : MovieStatus
-    data class ReleaseStatus(val text: String) : MovieStatus
-}
-```
-
-The `when` in the content function is exhaustive — adding a new subtype without handling it is a compile error.
-
----
-
-## State
-
-Each screen uses a `sealed class` for state and a `sealed class` for actions:
-
-```kotlin
-sealed class MovieListState {
-    data object Loading : MovieListState()
-    data object Empty   : MovieListState()
-    data class  Success(val movies: List<Movie>) : MovieListState()
-    data class  Error(val message: String? = null) : MovieListState()
-}
-```
-
-`Empty` is emitted by the ViewModel (not the UI) when the observe flow returns an empty list after a prior `Success` or `Empty` state, keeping the UI free of list-size checks.
 
 ---
 
