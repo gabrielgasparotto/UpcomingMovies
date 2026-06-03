@@ -2,7 +2,7 @@
 
 An Android application that displays upcoming movies fetched from [The Movie Database (TMDB) API](https://www.themoviedb.org/), with offline support via local caching, a detail screen for each movie, and a favorites system.
 
-<video src="https://github.com/user-attachments/assets/5a7d3460-f1fc-4aae-9408-c1080657cb04"></video>
+<video src="https://github.com/user-attachments/assets/71fdc895-e13d-4273-9878-e29dddb51645"></video>
 
 ---
 
