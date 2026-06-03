@@ -1,7 +1,7 @@
 package com.example.upcomingmovies.feature.movielist.di
 
 import androidx.room.Room
-import com.example.upcomingmovies.feature.movielist.data.local.AppDatabase
+import com.example.upcomingmovies.feature.core.data.AppDatabase
 import com.example.upcomingmovies.feature.movielist.data.remote.MovieService
 import com.example.upcomingmovies.feature.movielist.data.repository.MovieRepositoryImpl
 import com.example.upcomingmovies.feature.movielist.domain.repository.MovieRepository

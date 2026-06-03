@@ -1,4 +1,4 @@
-package com.example.upcomingmovies.feature.core.extensions
+package com.example.upcomingmovies.feature.core.domain
 
 import java.text.SimpleDateFormat
 import java.util.Calendar

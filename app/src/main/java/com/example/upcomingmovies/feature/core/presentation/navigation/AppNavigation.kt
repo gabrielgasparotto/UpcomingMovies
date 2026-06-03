@@ -1,4 +1,4 @@
-package com.example.upcomingmovies.feature.core.ui.navigation
+package com.example.upcomingmovies.feature.core.presentation.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier

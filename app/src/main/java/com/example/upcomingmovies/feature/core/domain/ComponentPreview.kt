@@ -1,4 +1,4 @@
-package com.example.upcomingmovies.feature.core.extensions
+package com.example.upcomingmovies.feature.core.domain
 
 import androidx.compose.ui.tooling.preview.Preview
 

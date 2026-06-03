@@ -30,7 +30,7 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import com.example.upcomingmovies.feature.core.extensions.ComponentPreview
+import com.example.upcomingmovies.feature.core.domain.ComponentPreview
 import com.example.upcomingmovies.feature.moviedetails.domain.model.MovieDetail
 
 private const val BACKDROP_BASE_URL = "https://image.tmdb.org/t/p/w780"

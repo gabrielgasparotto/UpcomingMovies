@@ -23,10 +23,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import com.example.upcomingmovies.feature.core.extensions.ComponentPreview
-import com.example.upcomingmovies.feature.core.extensions.daysUntilRelease
-import com.example.upcomingmovies.feature.core.extensions.formatToBrDate
-import com.example.upcomingmovies.feature.core.extensions.toReleaseLabel
+import com.example.upcomingmovies.feature.core.domain.ComponentPreview
+import com.example.upcomingmovies.feature.core.domain.daysUntilRelease
+import com.example.upcomingmovies.feature.core.domain.formatToBrDate
+import com.example.upcomingmovies.feature.core.domain.toReleaseLabel
 import com.example.upcomingmovies.feature.movielist.domain.model.Movie
 import java.text.SimpleDateFormat
 import java.util.Calendar

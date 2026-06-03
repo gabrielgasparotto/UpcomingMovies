@@ -15,9 +15,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.example.upcomingmovies.feature.core.extensions.ComponentPreview
-import com.example.upcomingmovies.feature.core.extensions.formatRuntime
-import com.example.upcomingmovies.feature.core.extensions.formatToBrDate
+import com.example.upcomingmovies.feature.core.domain.ComponentPreview
+import com.example.upcomingmovies.feature.core.domain.formatRuntime
+import com.example.upcomingmovies.feature.core.domain.formatToBrDate
 
 @Composable
 internal fun MovieDetailInfo(

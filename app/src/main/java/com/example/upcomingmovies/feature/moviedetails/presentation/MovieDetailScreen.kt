@@ -14,7 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.tooling.preview.PreviewParameter
-import com.example.upcomingmovies.feature.core.extensions.ComponentPreview
+import com.example.upcomingmovies.feature.core.domain.ComponentPreview
 import com.example.upcomingmovies.feature.moviedetails.domain.model.MovieDetail
 import com.example.upcomingmovies.feature.moviedetails.presentation.components.MovieDetailGenres
 import com.example.upcomingmovies.feature.moviedetails.presentation.components.MovieDetailHeader

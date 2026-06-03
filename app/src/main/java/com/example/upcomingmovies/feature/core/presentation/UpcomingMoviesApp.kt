@@ -1,4 +1,4 @@
-package com.example.upcomingmovies.feature.core.ui
+package com.example.upcomingmovies.feature.core.presentation
 
 import android.app.Application
 import com.example.upcomingmovies.feature.moviedetails.di.movieDetailModule

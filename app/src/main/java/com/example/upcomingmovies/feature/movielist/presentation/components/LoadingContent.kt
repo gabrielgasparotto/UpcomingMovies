@@ -7,7 +7,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.example.upcomingmovies.feature.core.extensions.ComponentPreview
+import com.example.upcomingmovies.feature.core.domain.ComponentPreview
 
 @Composable
 internal fun LoadingContent(modifier: Modifier = Modifier) {

@@ -10,7 +10,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.upcomingmovies.feature.core.extensions.ComponentPreview
+import com.example.upcomingmovies.feature.core.domain.ComponentPreview
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable

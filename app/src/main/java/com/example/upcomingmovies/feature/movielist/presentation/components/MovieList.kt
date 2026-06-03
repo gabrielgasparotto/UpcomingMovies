@@ -9,7 +9,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.upcomingmovies.feature.core.extensions.ComponentPreview
+import com.example.upcomingmovies.feature.core.domain.ComponentPreview
 import com.example.upcomingmovies.feature.movielist.domain.model.Movie
 
 @Composable
