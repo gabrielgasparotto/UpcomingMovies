@@ -18,14 +18,18 @@ import com.example.upcomingmovies.R
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import com.example.upcomingmovies.feature.core.domain.ComponentPreview
 import com.example.upcomingmovies.feature.moviedetails.domain.model.MovieDetail
-import com.example.upcomingmovies.feature.moviedetails.presentation.components.MovieDetailGenres
-import com.example.upcomingmovies.feature.moviedetails.presentation.components.MovieDetailHeader
-import com.example.upcomingmovies.feature.moviedetails.presentation.components.MovieDetailInfo
+import com.example.upcomingmovies.feature.moviedetails.presentation.components.moviedetailgenres.MovieDetailGenresComponent
+import com.example.upcomingmovies.feature.moviedetails.presentation.components.moviedetailgenres.MovieDetailGenresParams
+import com.example.upcomingmovies.feature.moviedetails.presentation.components.moviedetailheader.MovieDetailHeaderComponent
+import com.example.upcomingmovies.feature.moviedetails.presentation.components.moviedetailheader.MovieDetailHeaderParams
+import com.example.upcomingmovies.feature.moviedetails.presentation.components.moviedetailinfo.MovieDetailInfoComponent
+import com.example.upcomingmovies.feature.moviedetails.presentation.components.moviedetailinfo.MovieDetailInfoParams
 import com.example.upcomingmovies.feature.moviedetails.presentation.viewmodel.MovieDetailAction
 import com.example.upcomingmovies.feature.moviedetails.presentation.viewmodel.MovieDetailState
 import com.example.upcomingmovies.feature.moviedetails.presentation.viewmodel.MovieDetailViewModel
-import com.example.upcomingmovies.feature.movielist.presentation.components.ErrorContent
-import com.example.upcomingmovies.feature.movielist.presentation.components.LoadingContent
+import com.example.upcomingmovies.feature.movielist.presentation.components.error.ErrorComponent
+import com.example.upcomingmovies.feature.movielist.presentation.components.error.ErrorComponentParams
+import com.example.upcomingmovies.feature.movielist.presentation.components.loading.LoadingComponent
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 
@@ -56,15 +60,18 @@ internal fun MovieDetailScreen(
 ) {
     Scaffold(modifier = modifier) { innerPadding ->
         when (state) {
-            is MovieDetailState.Loading -> LoadingContent(Modifier.padding(innerPadding))
+            is MovieDetailState.Loading -> LoadingComponent(Modifier.padding(innerPadding))
             is MovieDetailState.Success -> MovieDetailContent(
                 movie = state.movie,
                 onBackClick = { onAction(MovieDetailAction.NavigateBack) },
                 modifier = Modifier.padding(innerPadding),
             )
-            is MovieDetailState.Error -> ErrorContent(
-                message = state.message ?: stringResource(R.string.error_load_movie_details),
-                onRetry = { onAction(MovieDetailAction.RetryLoad) },
+            is MovieDetailState.Error -> ErrorComponent(
+                params = ErrorComponentParams(
+                    message = stringResource(R.string.error_load_movie_details),
+                    onRetryText = stringResource(R.string.action_retry),
+                    onRetry = { onAction(MovieDetailAction.RetryLoad) },
+                ),
                 modifier = Modifier.padding(innerPadding),
             )
         }
@@ -79,20 +86,26 @@ private fun MovieDetailContent(
 ) {
     LazyColumn(modifier = modifier.fillMaxSize()) {
         item {
-            MovieDetailHeader(movie = movie, onBackClick = onBackClick)
+            MovieDetailHeaderComponent(
+                params = MovieDetailHeaderParams(movie = movie, onBackClick = onBackClick),
+            )
         }
         item {
             Spacer(modifier = Modifier.height(8.dp))
-            MovieDetailGenres(genres = movie.genres)
+            MovieDetailGenresComponent(
+                params = MovieDetailGenresParams(genres = movie.genres),
+            )
         }
         item {
             Spacer(modifier = Modifier.height(16.dp))
-            MovieDetailInfo(
-                voteAverage = movie.voteAverage,
-                voteCount = movie.voteCount,
-                runtime = movie.runtime,
-                releaseDate = movie.releaseDate,
-                status = movie.status,
+            MovieDetailInfoComponent(
+                params = MovieDetailInfoParams(
+                    voteAverage = movie.voteAverage,
+                    voteCount = movie.voteCount,
+                    runtime = movie.runtime,
+                    releaseDate = movie.releaseDate,
+                    status = movie.status,
+                ),
             )
         }
         if (movie.overview.isNotBlank()) {

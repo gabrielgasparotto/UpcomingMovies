@@ -36,8 +36,10 @@ class MovieListViewModel(
         viewModelScope.launch {
             observeMoviesUseCase().collect { movies ->
                 val current = _state.value
-                if (movies.isNotEmpty() || current is MovieListState.Success) {
+                if (movies.isNotEmpty()) {
                     _state.value = MovieListState.Success(movies)
+                } else if (current is MovieListState.Success || current is MovieListState.Empty) {
+                    _state.value = MovieListState.Empty
                 }
             }
         }

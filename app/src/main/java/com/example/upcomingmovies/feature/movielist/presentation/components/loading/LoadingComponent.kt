@@ -1,4 +1,4 @@
-package com.example.upcomingmovies.feature.movielist.presentation.components
+package com.example.upcomingmovies.feature.movielist.presentation.components.loading
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -10,7 +10,12 @@ import androidx.compose.ui.Modifier
 import com.example.upcomingmovies.feature.core.domain.ComponentPreview
 
 @Composable
-internal fun LoadingContent(modifier: Modifier = Modifier) {
+internal fun LoadingComponent(modifier: Modifier = Modifier) {
+    LoadingComponentContent(modifier = modifier)
+}
+
+@Composable
+private fun LoadingComponentContent(modifier: Modifier = Modifier) {
     Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         CircularProgressIndicator()
     }
@@ -18,8 +23,8 @@ internal fun LoadingContent(modifier: Modifier = Modifier) {
 
 @ComponentPreview
 @Composable
-private fun LoadingContentPreview() {
+private fun LoadingComponentPreview() {
     MaterialTheme {
-        LoadingContent()
+        LoadingComponent()
     }
 }

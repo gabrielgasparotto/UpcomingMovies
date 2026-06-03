@@ -1,4 +1,4 @@
-package com.example.upcomingmovies.feature.movielist.presentation.components
+package com.example.upcomingmovies.feature.movielist.presentation.components.movieitem
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -19,27 +19,63 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import androidx.compose.ui.res.stringResource
 import com.example.upcomingmovies.R
 import com.example.upcomingmovies.feature.core.domain.ComponentPreview
 import com.example.upcomingmovies.feature.core.domain.daysUntilRelease
 import com.example.upcomingmovies.feature.core.domain.formatToDefaultDate
 import com.example.upcomingmovies.feature.movielist.domain.model.Movie
-import java.text.SimpleDateFormat
-import java.util.Calendar
-import java.util.Locale
 
 private const val POSTER_BASE_URL = "https://image.tmdb.org/t/p/w185"
 private const val ONE_DAY = 1L
 private const val TODAY = 0L
 
+private sealed interface MovieStatus {
+    data class Rated(val rating: String) : MovieStatus
+    data class ReleaseStatus(val text: String) : MovieStatus
+}
+
+internal data class MovieItemParams(
+    val movie: Movie,
+    val onClick: () -> Unit,
+)
+
 @Composable
-internal fun MovieItem(
-    movie: Movie,
+internal fun MovieItemComponent(params: MovieItemParams, modifier: Modifier = Modifier) {
+    val movie = params.movie
+    val status: MovieStatus = if (movie.voteAverage != 0.0) {
+        MovieStatus.Rated("%.1f".format(movie.voteAverage))
+    } else {
+        MovieStatus.ReleaseStatus(
+            when (val days = movie.releaseDate.daysUntilRelease()) {
+                ONE_DAY -> stringResource(R.string.release_in_one_day)
+                TODAY -> stringResource(R.string.releasing_today)
+                else -> if (days > ONE_DAY) stringResource(R.string.release_in_days, days)
+                        else stringResource(R.string.already_released)
+            }
+        )
+    }
+    MovieItemComponentContent(
+        posterUrl = movie.posterPath?.let { "$POSTER_BASE_URL$it" },
+        title = movie.title,
+        releaseDate = movie.releaseDate.formatToDefaultDate(),
+        status = status,
+        onClick = params.onClick,
+        modifier = modifier,
+    )
+}
+
+@Composable
+private fun MovieItemComponentContent(
+    posterUrl: String?,
+    title: String,
+    releaseDate: String,
+    status: MovieStatus,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -51,8 +87,8 @@ internal fun MovieItem(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         AsyncImage(
-            model = movie.posterPath?.let { "$POSTER_BASE_URL$it" },
-            contentDescription = movie.title,
+            model = posterUrl,
+            contentDescription = title,
             contentScale = ContentScale.Crop,
             modifier = Modifier
                 .size(width = 80.dp, height = 120.dp)
@@ -64,7 +100,7 @@ internal fun MovieItem(
 
         Column(modifier = Modifier.weight(1f)) {
             Text(
-                text = movie.title,
+                text = title,
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 maxLines = 2,
@@ -72,24 +108,13 @@ internal fun MovieItem(
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
-                text = movie.releaseDate.formatToDefaultDate(),
+                text = releaseDate,
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
             Spacer(modifier = Modifier.height(6.dp))
-            if (movie.voteAverage == 0.0) {
-                Text(
-                    text = when (val days = movie.releaseDate.daysUntilRelease()) {
-                        ONE_DAY -> stringResource(R.string.release_in_one_day)
-                        TODAY -> stringResource(R.string.releasing_today)
-                        else -> if (days > ONE_DAY) stringResource(R.string.release_in_days, days)
-                                else stringResource(R.string.already_released)
-                    },
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            } else {
-                Row(verticalAlignment = Alignment.CenterVertically) {
+            when (status) {
+                is MovieStatus.Rated -> Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
                         text = "★",
                         color = Color(0xFFFFC107),
@@ -97,11 +122,16 @@ internal fun MovieItem(
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
-                        text = "%.1f".format(movie.voteAverage),
+                        text = status.rating,
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.SemiBold,
                     )
                 }
+                is MovieStatus.ReleaseStatus -> Text(
+                    text = status.text,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
             }
         }
     }
@@ -109,36 +139,10 @@ internal fun MovieItem(
 
 @ComponentPreview
 @Composable
-private fun MovieItemRatedPreview() {
+private fun MovieItemComponentPreview(
+    @PreviewParameter(MovieItemPreviewProvider::class) params: MovieItemParams,
+) {
     MaterialTheme {
-        MovieItem(
-            movie = Movie(1, "Evil Dead Rise", "Two sisters find an ancient vinyl...", "2023-04-12", "/mIBCtPvKZQlxubxKMeViO2UrP3q.jpg", 7.0),
-            onClick = {},
-        )
-    }
-}
-
-@ComponentPreview
-@Composable
-private fun MovieItemUnreleasedPreview() {
-    val dateStr = SimpleDateFormat("yyyy-MM-dd", Locale.US).format(
-        Calendar.getInstance().apply { add(Calendar.DAY_OF_YEAR, 30) }.time
-    )
-    MaterialTheme {
-        MovieItem(
-            movie = Movie(2, "Fast X", "Dom Toretto and his family face their deadliest foe.", dateStr, "/jwMMQR69Xz9AYtX4u2uYJgfAAev.jpg", 0.0),
-            onClick = {},
-        )
-    }
-}
-
-@ComponentPreview
-@Composable
-private fun MovieItemNoPosterPreview() {
-    MaterialTheme {
-        MovieItem(
-            movie = Movie(3, "Movie Without Poster", "No poster available.", "2023-05-17", null, 5.5),
-            onClick = {},
-        )
+        MovieItemComponent(params = params)
     }
 }

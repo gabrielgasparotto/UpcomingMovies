@@ -1,14 +1,12 @@
-package com.example.upcomingmovies.feature.moviedetails.presentation
+package com.example.upcomingmovies.feature.moviedetails.presentation.components.moviedetailheader
 
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import com.example.upcomingmovies.feature.moviedetails.domain.model.MovieDetail
-import com.example.upcomingmovies.feature.moviedetails.presentation.viewmodel.MovieDetailState
 
-class MovieDetailStatePreviewProvider : PreviewParameterProvider<MovieDetailState> {
+internal class MovieDetailHeaderPreviewProvider : PreviewParameterProvider<MovieDetailHeaderParams> {
     override val values = sequenceOf(
-        MovieDetailState.Loading,
-        MovieDetailState.Success(
-            MovieDetail(
+        MovieDetailHeaderParams(
+            movie = MovieDetail(
                 id = 11,
                 title = "Star Wars",
                 tagline = "A long time ago in a galaxy far, far away...",
@@ -21,8 +19,8 @@ class MovieDetailStatePreviewProvider : PreviewParameterProvider<MovieDetailStat
                 posterPath = "/6FfCtAuVAW8XJjZ7eWeLibRLWTw.jpg",
                 backdropPath = "/2w4xG178RpB4MDAIfTkqAuSJzec.jpg",
                 genres = listOf("Adventure", "Action", "Science Fiction"),
-            )
+            ),
+            onBackClick = {},
         ),
-        MovieDetailState.Error("Failed to load movie details."),
     )
 }

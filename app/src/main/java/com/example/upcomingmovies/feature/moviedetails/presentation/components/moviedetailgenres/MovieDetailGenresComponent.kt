@@ -1,4 +1,4 @@
-package com.example.upcomingmovies.feature.moviedetails.presentation.components
+package com.example.upcomingmovies.feature.moviedetails.presentation.components.moviedetailgenres
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -9,15 +9,20 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import com.example.upcomingmovies.feature.core.domain.ComponentPreview
 
+internal data class MovieDetailGenresParams(val genres: List<String>)
+
+@Composable
+internal fun MovieDetailGenresComponent(params: MovieDetailGenresParams, modifier: Modifier = Modifier) {
+    MovieDetailGenresComponentContent(genres = params.genres, modifier = modifier)
+}
+
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-internal fun MovieDetailGenres(
-    genres: List<String>,
-    modifier: Modifier = Modifier,
-) {
+private fun MovieDetailGenresComponentContent(genres: List<String>, modifier: Modifier = Modifier) {
     FlowRow(
         modifier = modifier.padding(horizontal = 16.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -30,8 +35,10 @@ internal fun MovieDetailGenres(
 
 @ComponentPreview
 @Composable
-private fun MovieDetailGenresPreview() {
+private fun MovieDetailGenresComponentPreview(
+    @PreviewParameter(MovieDetailGenresPreviewProvider::class) params: MovieDetailGenresParams,
+) {
     MaterialTheme {
-        MovieDetailGenres(genres = listOf("Adventure", "Action", "Science Fiction"))
+        MovieDetailGenresComponent(params = params)
     }
 }

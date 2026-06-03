@@ -1,4 +1,4 @@
-package com.example.upcomingmovies.feature.moviedetails.presentation.components
+package com.example.upcomingmovies.feature.moviedetails.presentation.components.moviedetailheader
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -26,10 +26,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.res.stringResource
 import coil.compose.AsyncImage
 import com.example.upcomingmovies.R
 import com.example.upcomingmovies.feature.core.domain.ComponentPreview
@@ -38,16 +39,36 @@ import com.example.upcomingmovies.feature.moviedetails.domain.model.MovieDetail
 private const val BACKDROP_BASE_URL = "https://image.tmdb.org/t/p/w780"
 private const val POSTER_BASE_URL = "https://image.tmdb.org/t/p/w342"
 
+internal data class MovieDetailHeaderParams(
+    val movie: MovieDetail,
+    val onBackClick: () -> Unit,
+)
+
 @Composable
-internal fun MovieDetailHeader(
-    movie: MovieDetail,
+internal fun MovieDetailHeaderComponent(params: MovieDetailHeaderParams, modifier: Modifier = Modifier) {
+    MovieDetailHeaderComponentContent(
+        backdropUrl = params.movie.backdropPath?.let { "$BACKDROP_BASE_URL$it" },
+        posterUrl = params.movie.posterPath?.let { "$POSTER_BASE_URL$it" },
+        title = params.movie.title,
+        tagline = params.movie.tagline.takeIf { it.isNotBlank() },
+        onBackClick = params.onBackClick,
+        modifier = modifier,
+    )
+}
+
+@Composable
+private fun MovieDetailHeaderComponentContent(
+    backdropUrl: String?,
+    posterUrl: String?,
+    title: String,
+    tagline: String?,
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier) {
         Box(modifier = Modifier.fillMaxWidth().height(200.dp)) {
             AsyncImage(
-                model = movie.backdropPath?.let { "$BACKDROP_BASE_URL$it" },
+                model = backdropUrl,
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
@@ -79,8 +100,8 @@ internal fun MovieDetailHeader(
             verticalAlignment = Alignment.Top,
         ) {
             AsyncImage(
-                model = movie.posterPath?.let { "$POSTER_BASE_URL$it" },
-                contentDescription = movie.title,
+                model = posterUrl,
+                contentDescription = title,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .size(width = 100.dp, height = 150.dp)
@@ -93,14 +114,14 @@ internal fun MovieDetailHeader(
 
             Column(modifier = Modifier.weight(1f).padding(top = 8.dp)) {
                 Text(
-                    text = movie.title,
+                    text = title,
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
                 )
-                if (movie.tagline.isNotBlank()) {
+                if (tagline != null) {
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        text = "\"${movie.tagline}\"",
+                        text = "\"$tagline\"",
                         style = MaterialTheme.typography.bodyMedium,
                         fontStyle = FontStyle.Italic,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -113,11 +134,10 @@ internal fun MovieDetailHeader(
 
 @ComponentPreview
 @Composable
-private fun MovieDetailHeaderPreview() {
+private fun MovieDetailHeaderComponentPreview(
+    @PreviewParameter(MovieDetailHeaderPreviewProvider::class) params: MovieDetailHeaderParams,
+) {
     MaterialTheme {
-        MovieDetailHeader(
-            movie = sampleMovieDetail,
-            onBackClick = {},
-        )
+        MovieDetailHeaderComponent(params = params)
     }
 }

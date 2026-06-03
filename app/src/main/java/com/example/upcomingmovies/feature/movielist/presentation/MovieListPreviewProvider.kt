@@ -14,7 +14,7 @@ class MovieListStatePreviewProvider : PreviewParameterProvider<MovieListState> {
     override val values = sequenceOf(
         MovieListState.Loading,
         MovieListState.Success(sampleMovies),
-        MovieListState.Success(emptyList()),
+        MovieListState.Empty,
         MovieListState.Error("Unable to load movies. Check your connection."),
     )
 }
