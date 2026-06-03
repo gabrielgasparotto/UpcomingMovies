@@ -5,5 +5,5 @@ import com.example.upcomingmovies.feature.moviedetails.domain.model.MovieDetail
 sealed class MovieDetailState {
     data object Loading : MovieDetailState()
     data class Success(val movie: MovieDetail) : MovieDetailState()
-    data class Error(val message: String) : MovieDetailState()
+    data class Error(val message: String? = null) : MovieDetailState()
 }

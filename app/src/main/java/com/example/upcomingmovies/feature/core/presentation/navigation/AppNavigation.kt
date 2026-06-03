@@ -12,7 +12,8 @@ import com.example.upcomingmovies.feature.movielist.presentation.MovieListRoute
 
 private object Routes {
     const val MOVIE_LIST = "movie_list"
-    const val MOVIE_DETAIL = "movie_detail/{movieId}"
+    const val MOVIE_ID_ARG = "movieId"
+    const val MOVIE_DETAIL = "movie_detail/{$MOVIE_ID_ARG}"
     fun movieDetail(movieId: Int) = "movie_detail/$movieId"
 }
 
@@ -32,9 +33,9 @@ fun AppNavigation(modifier: Modifier = Modifier) {
         }
         composable(
             route = Routes.MOVIE_DETAIL,
-            arguments = listOf(navArgument("movieId") { type = NavType.IntType }),
+            arguments = listOf(navArgument(Routes.MOVIE_ID_ARG) { type = NavType.IntType }),
         ) { backStackEntry ->
-            val movieId = backStackEntry.arguments?.getInt("movieId") ?: return@composable
+            val movieId = backStackEntry.arguments?.getInt(Routes.MOVIE_ID_ARG) ?: return@composable
             MovieDetailRoute(
                 movieId = movieId,
                 onBackClick = { navController.popBackStack() },

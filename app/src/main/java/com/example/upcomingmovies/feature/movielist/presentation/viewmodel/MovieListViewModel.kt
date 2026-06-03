@@ -49,7 +49,7 @@ class MovieListViewModel(
                 .onFailure { error ->
                     if (_state.value !is MovieListState.Success) {
                         _state.value = MovieListState.Error(
-                            error.message ?: "Failed to load movies"
+                            error.message
                         )
                     }
                 }

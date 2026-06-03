@@ -18,13 +18,14 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 private const val TMDB_BASE_URL = "https://api.themoviedb.org/3/"
+private const val DATABASE_NAME = "upcoming_movies.db"
 
 val movieListModule = module {
     single {
         Room.databaseBuilder(
             androidContext(),
             AppDatabase::class.java,
-            "upcoming_movies.db",
+            DATABASE_NAME,
         ).build()
     }
     single { get<AppDatabase>().movieDao() }

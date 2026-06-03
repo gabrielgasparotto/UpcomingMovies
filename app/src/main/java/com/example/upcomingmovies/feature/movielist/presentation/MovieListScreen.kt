@@ -66,7 +66,7 @@ internal fun MovieListScreen(
                 )
             }
             is MovieListState.Error -> ErrorContent(
-                message = state.message,
+                message = state.message ?: stringResource(R.string.error_load_movies),
                 onRetry = { onAction(MovieListAction.RetryLoad) },
                 modifier = Modifier.padding(innerPadding),
             )

@@ -2,5 +2,7 @@ package com.example.upcomingmovies.feature.core.domain
 
 import androidx.compose.ui.tooling.preview.Preview
 
-@Preview(showBackground = true, backgroundColor = 0xFFF5F5F5)
+const val BACKGROUND_COLOR = 0xFFF5F5F5
+
+@Preview(showBackground = true, backgroundColor = BACKGROUND_COLOR)
 annotation class ComponentPreview

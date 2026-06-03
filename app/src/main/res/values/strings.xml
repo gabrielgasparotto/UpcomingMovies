@@ -4,6 +4,8 @@
     <!-- Movie list -->
     <string name="title_upcoming_movies">Upcoming Movies</string>
     <string name="error_no_upcoming_movies">No upcoming movies available.</string>
+    <string name="error_load_movies">Failed to load movies.</string>
+    <string name="error_load_movie_details">Failed to load movie details.</string>
     <string name="action_retry">Retry</string>
 
     <!-- Release countdown labels -->

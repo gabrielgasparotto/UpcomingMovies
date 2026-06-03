@@ -63,7 +63,7 @@ internal fun MovieDetailScreen(
                 modifier = Modifier.padding(innerPadding),
             )
             is MovieDetailState.Error -> ErrorContent(
-                message = state.message,
+                message = state.message ?: stringResource(R.string.error_load_movie_details),
                 onRetry = { onAction(MovieDetailAction.RetryLoad) },
                 modifier = Modifier.padding(innerPadding),
             )
