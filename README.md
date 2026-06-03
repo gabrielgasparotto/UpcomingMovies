@@ -2,7 +2,7 @@
 
 An Android application that displays upcoming movies fetched from [The Movie Database (TMDB) API](https://www.themoviedb.org/), with offline support via local caching and a detail screen for each movie.
 
-https://github.com/user-attachments/assets/bd16d386-dba7-4cac-b60d-ced002befeb4
+<video src="https://github.com/user-attachments/assets/bd16d386-dba7-4cac-b60d-ced002befeb4" autoplay loop muted playsinline></video>
 
 ---
 
@@ -19,18 +19,42 @@ The app allows users to:
 
 ## Tech Stack
 
-| Layer | Technology |
-|---|---|
-| Language | Kotlin |
-| UI | Jetpack Compose + Material 3 |
-| Navigation | Navigation Compose |
-| ViewModel | Jetpack ViewModel + StateFlow |
-| Dependency Injection | Koin 4 |
-| Networking | Retrofit 2 + OkHttp 4 + Gson |
-| Local cache | Room 2 |
-| Image loading | Coil 2 |
-| Async | Coroutines + Flow |
-| Build | AGP 9 · Kotlin 2.1 · KSP · Gradle version catalogs |
+**Language & Build**
+Kotlin 2.1 · AGP 9 · KSP · Gradle version catalogs
+
+**UI**
+Jetpack Compose · Material 3 · Navigation Compose · Coil 2
+
+**Architecture**
+Jetpack ViewModel · StateFlow · Coroutines · Flow
+
+**Dependency Injection**
+Koin 4
+
+**Networking**
+Retrofit 2 · OkHttp 4 · Gson
+
+**Persistence**
+Room 2
+
+**Testing**
+JUnit 4 · MockK · kotlinx-coroutines-test · Turbine · Compose UI Test
+
+---
+
+## Architecture
+
+The project follows Clean Architecture with a feature-first package structure, split into three layers:
+
+```
+Presentation  →  Domain  ←  Data
+```
+
+- **Domain** — plain Kotlin. Models, repository interfaces, use cases. No Android dependencies.
+- **Data** — implements the domain interfaces. Room DAOs, Retrofit services, mappers.
+- **Presentation** — Compose UI, ViewModels. Observes state, dispatches actions.
+
+The dependency rule flows inward: Presentation and Data both depend on Domain, but never on each other.
 
 ---
 
