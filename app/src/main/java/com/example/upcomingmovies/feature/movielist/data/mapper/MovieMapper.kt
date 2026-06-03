@@ -11,6 +11,7 @@ internal fun MovieDto.toEntity(): MovieEntity = MovieEntity(
     releaseDate = releaseDate,
     posterPath = posterPath,
     voteAverage = voteAverage,
+    voteCount = voteCount,
 )
 
 internal fun MovieEntity.toDomain(): Movie = Movie(
@@ -20,4 +21,5 @@ internal fun MovieEntity.toDomain(): Movie = Movie(
     releaseDate = releaseDate,
     posterPath = posterPath,
     voteAverage = voteAverage,
+    voteCount = voteCount,
 )

@@ -26,13 +26,13 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.example.upcomingmovies.R
+import com.example.upcomingmovies.feature.core.presentation.TmdbImageConfig
 import com.example.upcomingmovies.feature.core.domain.ComponentPreview
 import com.example.upcomingmovies.feature.core.domain.daysUntilRelease
 import com.example.upcomingmovies.feature.core.domain.formatToDefaultDate
 import com.example.upcomingmovies.feature.movielist.domain.model.Movie
 import java.util.Locale
 
-private const val POSTER_BASE_URL = "https://image.tmdb.org/t/p/w185"
 private const val ONE_DAY = 1L
 private const val TODAY = 0L
 
@@ -49,7 +49,7 @@ internal data class MovieItemParams(
 @Composable
 internal fun MovieItemComponent(params: MovieItemParams, modifier: Modifier = Modifier) {
     val movie = params.movie
-    val status: MovieStatus = if (movie.voteAverage != 0.0) {
+    val status: MovieStatus = if (movie.voteCount > 0) {
         MovieStatus.Rated(String.format(Locale.US, "%.1f", movie.voteAverage))
     } else {
         MovieStatus.ReleaseStatus(
@@ -62,7 +62,7 @@ internal fun MovieItemComponent(params: MovieItemParams, modifier: Modifier = Mo
         )
     }
     MovieItemComponentContent(
-        posterUrl = movie.posterPath?.let { "$POSTER_BASE_URL$it" },
+        posterUrl = TmdbImageConfig.posterSmallUrl(movie.posterPath),
         title = movie.title,
         releaseDate = movie.releaseDate.formatToDefaultDate(),
         status = status,

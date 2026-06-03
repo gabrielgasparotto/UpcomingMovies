@@ -32,7 +32,7 @@ class MovieDetailViewModel(
             _state.value = MovieDetailState.Loading
             runCatching { getMovieDetailUseCase(movieId) }
                 .onSuccess { _state.value = MovieDetailState.Success(it) }
-                .onFailure { _state.value = MovieDetailState.Error(it.message) }
+                .onFailure { _state.value = MovieDetailState.Error }
         }
     }
 }

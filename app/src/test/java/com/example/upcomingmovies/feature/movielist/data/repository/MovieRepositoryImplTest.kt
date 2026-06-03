@@ -98,6 +98,7 @@ class MovieRepositoryImplTest {
         assertEquals(dto.releaseDate, entity.releaseDate)
         assertEquals(dto.posterPath, entity.posterPath)
         assertEquals(dto.voteAverage, entity.voteAverage, 0.0)
+        assertEquals(dto.voteCount, entity.voteCount)
     }
 
     @Test
@@ -137,6 +138,7 @@ private fun buildMovieEntity(id: Int = 1) = MovieEntity(
     releaseDate = "2023-04-12",
     posterPath = "/poster.jpg",
     voteAverage = 7.0,
+    voteCount = 1234,
 )
 
 private fun buildMovieDto(id: Int = 1) = MovieDto(

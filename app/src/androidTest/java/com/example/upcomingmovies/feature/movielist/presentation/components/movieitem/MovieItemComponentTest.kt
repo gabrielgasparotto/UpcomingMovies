@@ -126,6 +126,7 @@ private fun buildRatedMovie(releaseDate: String = "2023-04-12") = Movie(
     releaseDate = releaseDate,
     posterPath = null,
     voteAverage = 7.0,
+    voteCount = 1234,
 )
 
 private fun buildUnratedMovie(releaseDate: String = "2099-01-01") = Movie(
@@ -135,4 +136,5 @@ private fun buildUnratedMovie(releaseDate: String = "2099-01-01") = Movie(
     releaseDate = releaseDate,
     posterPath = null,
     voteAverage = 0.0,
+    voteCount = 0,
 )

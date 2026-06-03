@@ -23,6 +23,6 @@ class MovieDetailStatePreviewProvider : PreviewParameterProvider<MovieDetailStat
                 genres = listOf("Adventure", "Action", "Science Fiction"),
             )
         ),
-        MovieDetailState.Error("Failed to load movie details."),
+        MovieDetailState.Error,
     )
 }

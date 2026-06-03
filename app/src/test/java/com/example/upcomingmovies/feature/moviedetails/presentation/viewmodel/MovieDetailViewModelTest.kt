@@ -69,7 +69,7 @@ class MovieDetailViewModelTest {
         advanceUntilIdle()
 
         // Then
-        assertEquals(MovieDetailState.Error("Not found"), viewModel.state.value)
+        assertEquals(MovieDetailState.Error, viewModel.state.value)
     }
 
     @Test
@@ -82,7 +82,7 @@ class MovieDetailViewModelTest {
         advanceUntilIdle()
 
         // Then
-        assertEquals(MovieDetailState.Error(null), viewModel.state.value)
+        assertEquals(MovieDetailState.Error, viewModel.state.value)
     }
 
     @Test
@@ -118,7 +118,7 @@ class MovieDetailViewModelTest {
         // Then — observe Loading → Success via Turbine since _state.value = Loading
         // is set inside the launched coroutine, not before it
         viewModel.state.test {
-            assertEquals(MovieDetailState.Error("error"), awaitItem())
+            assertEquals(MovieDetailState.Error, awaitItem())
             viewModel.onAction(MovieDetailAction.RetryLoad)
             advanceUntilIdle()
             assertEquals(MovieDetailState.Loading, awaitItem())

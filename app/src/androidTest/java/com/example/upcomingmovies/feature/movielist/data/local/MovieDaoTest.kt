@@ -166,11 +166,13 @@ private fun buildEntity(
     title: String = "Movie $id",
     releaseDate: String = "2023-01-01",
     voteAverage: Double = 7.0,
+    voteCount: Int = 100,
 ) = MovieEntity(
     id = id,
     title = title,
     overview = "Overview for movie $id",
     releaseDate = releaseDate,
     posterPath = null,
+    voteCount = voteCount,
     voteAverage = voteAverage,
 )

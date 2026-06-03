@@ -10,18 +10,21 @@ const val DEFAULT_DATE_FORMAT = "dd/MM/yyyy"
 const val DEFAULT_VALUE = 0
 const val INVALID_DATE_FORMAT_MESSAGE = "Invalid date format: %s. Expected format: $US_DATE_FORMAT"
 
-private val inputDateFormat = SimpleDateFormat(US_DATE_FORMAT, Locale.US)
-private val outputDateFormat: SimpleDateFormat
-    get() = SimpleDateFormat(DEFAULT_DATE_FORMAT, Locale.getDefault())
+private val inputFormatter = ThreadLocal.withInitial {
+    SimpleDateFormat(US_DATE_FORMAT, Locale.US)
+}
+private val outputFormatter = ThreadLocal.withInitial {
+    SimpleDateFormat(DEFAULT_DATE_FORMAT, Locale.getDefault())
+}
 
 internal fun String.formatToDefaultDate(): String = try {
-    inputDateFormat.parse(this)?.let { outputDateFormat.format(it) } ?: this
+    inputFormatter.get()!!.parse(this)?.let { outputFormatter.get()!!.format(it) } ?: this
 } catch (e: Exception) {
     throw IllegalArgumentException(INVALID_DATE_FORMAT_MESSAGE.format(this), e)
 }
 
 internal fun String.daysUntilRelease(): Long = try {
-    val releaseMs = inputDateFormat.parse(this)?.time ?: return 0L
+    val releaseMs = inputFormatter.get()!!.parse(this)?.time ?: return 0L
     val todayMs = Calendar.getInstance().apply {
         set(Calendar.HOUR_OF_DAY, DEFAULT_VALUE)
         set(Calendar.MINUTE, DEFAULT_VALUE)

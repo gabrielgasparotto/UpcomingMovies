@@ -103,14 +103,14 @@ class MovieListViewModelTest {
         coEvery { refreshMoviesUseCase() } throws RuntimeException("error")
         val viewModel = createViewModel()
         advanceUntilIdle()
-        assertEquals(MovieListState.Error("error"), viewModel.state.value)
+        assertEquals(MovieListState.Error, viewModel.state.value)
 
         // When — observe emits empty list while in Error state
         moviesFlow.emit(emptyList())
         advanceUntilIdle()
 
         // Then — Error is unchanged; empty only triggers Empty when coming from Success/Empty
-        assertEquals(MovieListState.Error("error"), viewModel.state.value)
+        assertEquals(MovieListState.Error, viewModel.state.value)
     }
 
     @Test
@@ -148,7 +148,7 @@ class MovieListViewModelTest {
         advanceUntilIdle()
 
         // Then
-        assertEquals(MovieListState.Error("Network error"), viewModel.state.value)
+        assertEquals(MovieListState.Error, viewModel.state.value)
     }
 
     @Test
@@ -179,7 +179,7 @@ class MovieListViewModelTest {
         advanceUntilIdle()
 
         // Then
-        assertEquals(MovieListState.Error(null), viewModel.state.value)
+        assertEquals(MovieListState.Error, viewModel.state.value)
     }
 
     // endregion
@@ -192,7 +192,7 @@ class MovieListViewModelTest {
         coEvery { refreshMoviesUseCase() } throws RuntimeException("error")
         val viewModel = createViewModel()
         advanceUntilIdle()
-        assertEquals(MovieListState.Error("error"), viewModel.state.value)
+        assertEquals(MovieListState.Error, viewModel.state.value)
 
         // When
         coJustRun { refreshMoviesUseCase() }
@@ -242,4 +242,5 @@ private fun buildMovie(id: Int = 1) = Movie(
     releaseDate = "2023-04-12",
     posterPath = "/poster.jpg",
     voteAverage = 7.0,
+    voteCount = 1234,
 )

@@ -33,11 +33,9 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.example.upcomingmovies.R
+import com.example.upcomingmovies.feature.core.presentation.TmdbImageConfig
 import com.example.upcomingmovies.feature.core.domain.ComponentPreview
 import com.example.upcomingmovies.feature.moviedetails.domain.model.MovieDetail
-
-private const val BACKDROP_BASE_URL = "https://image.tmdb.org/t/p/w780"
-private const val POSTER_BASE_URL = "https://image.tmdb.org/t/p/w342"
 
 internal data class MovieDetailHeaderParams(
     val movie: MovieDetail,
@@ -47,8 +45,8 @@ internal data class MovieDetailHeaderParams(
 @Composable
 internal fun MovieDetailHeaderComponent(params: MovieDetailHeaderParams, modifier: Modifier = Modifier) {
     MovieDetailHeaderComponentContent(
-        backdropUrl = params.movie.backdropPath?.let { "$BACKDROP_BASE_URL$it" },
-        posterUrl = params.movie.posterPath?.let { "$POSTER_BASE_URL$it" },
+        backdropUrl = TmdbImageConfig.backdropUrl(params.movie.backdropPath),
+        posterUrl = TmdbImageConfig.posterLargeUrl(params.movie.posterPath),
         title = params.movie.title,
         tagline = params.movie.tagline.takeIf { it.isNotBlank() },
         onBackClick = params.onBackClick,

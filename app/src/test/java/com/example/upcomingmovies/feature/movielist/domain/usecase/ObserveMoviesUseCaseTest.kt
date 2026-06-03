@@ -49,4 +49,5 @@ private fun buildMovie() = Movie(
     releaseDate = "2023-04-12",
     posterPath = "/poster.jpg",
     voteAverage = 7.0,
+    voteCount = 1234,
 )

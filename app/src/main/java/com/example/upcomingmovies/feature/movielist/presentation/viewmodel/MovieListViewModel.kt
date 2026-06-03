@@ -50,9 +50,7 @@ class MovieListViewModel(
             runCatching { refreshMoviesUseCase() }
                 .onFailure { error ->
                     if (_state.value !is MovieListState.Success) {
-                        _state.value = MovieListState.Error(
-                            error.message
-                        )
+                        _state.value = MovieListState.Error
                     }
                 }
         }

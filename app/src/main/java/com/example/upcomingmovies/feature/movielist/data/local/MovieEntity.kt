@@ -11,4 +11,5 @@ data class MovieEntity(
     val releaseDate: String,
     val posterPath: String?,
     val voteAverage: Double,
+    val voteCount: Int,
 )

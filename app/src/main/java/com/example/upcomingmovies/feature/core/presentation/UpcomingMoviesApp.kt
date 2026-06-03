@@ -1,6 +1,7 @@
 package com.example.upcomingmovies.feature.core.presentation
 
 import android.app.Application
+import com.example.upcomingmovies.feature.core.di.networkModule
 import com.example.upcomingmovies.feature.moviedetails.di.movieDetailModule
 import com.example.upcomingmovies.feature.movielist.di.movieListModule
 import org.koin.android.ext.koin.androidContext
@@ -11,7 +12,7 @@ class UpcomingMoviesApp : Application() {
         super.onCreate()
         startKoin {
             androidContext(this@UpcomingMoviesApp)
-            modules(movieListModule, movieDetailModule)
+            modules(networkModule, movieListModule, movieDetailModule)
         }
     }
 }

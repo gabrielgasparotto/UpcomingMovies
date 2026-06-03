@@ -26,6 +26,7 @@ class MovieMapperTest {
         assertEquals(dto.releaseDate, entity.releaseDate)
         assertEquals(dto.posterPath, entity.posterPath)
         assertEquals(dto.voteAverage, entity.voteAverage, 0.0)
+        assertEquals(dto.voteCount, entity.voteCount)
     }
 
     @Test
@@ -59,6 +60,7 @@ class MovieMapperTest {
         assertEquals(entity.releaseDate, domain.releaseDate)
         assertEquals(entity.posterPath, domain.posterPath)
         assertEquals(entity.voteAverage, domain.voteAverage, 0.0)
+        assertEquals(entity.voteCount, domain.voteCount)
     }
 
     @Test
@@ -84,6 +86,7 @@ class MovieMapperTest {
             releaseDate = dto.releaseDate,
             posterPath = dto.posterPath,
             voteAverage = dto.voteAverage,
+            voteCount = dto.voteCount,
         )
 
         // When
@@ -120,4 +123,5 @@ private fun buildMovieEntity(posterPath: String? = "/poster.jpg") = MovieEntity(
     releaseDate = "2023-04-12",
     posterPath = posterPath,
     voteAverage = 7.0,
+    voteCount = 1234,
 )
