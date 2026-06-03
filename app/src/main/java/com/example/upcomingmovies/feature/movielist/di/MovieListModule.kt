@@ -1,8 +1,6 @@
 package com.example.upcomingmovies.feature.movielist.di
 
 import androidx.room.Room
-import androidx.room.migration.Migration
-import androidx.sqlite.db.SupportSQLiteDatabase
 import com.example.upcomingmovies.feature.core.data.AppDatabase
 import com.example.upcomingmovies.feature.movielist.data.remote.MovieService
 import com.example.upcomingmovies.feature.movielist.data.repository.HeartRepositoryImpl
@@ -21,20 +19,6 @@ import retrofit2.Retrofit
 
 private const val DATABASE_NAME = "upcoming_movies.db"
 
-private val MIGRATION_1_2 = object : Migration(1, 2) {
-    override fun migrate(db: SupportSQLiteDatabase) {
-        db.execSQL("ALTER TABLE movies ADD COLUMN voteCount INTEGER NOT NULL DEFAULT 0")
-    }
-}
-
-private val MIGRATION_2_3 = object : Migration(2, 3) {
-    override fun migrate(db: SupportSQLiteDatabase) {
-        db.execSQL(
-            "CREATE TABLE IF NOT EXISTS `hearted_movies` (`movieId` INTEGER NOT NULL, PRIMARY KEY(`movieId`))"
-        )
-    }
-}
-
 val movieListModule = module {
     single {
         Room.databaseBuilder(
@@ -42,7 +26,7 @@ val movieListModule = module {
             AppDatabase::class.java,
             DATABASE_NAME,
         )
-            .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
+            .fallbackToDestructiveMigration(false)
             .build()
     }
     single { get<AppDatabase>().movieDao() }
