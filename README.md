@@ -8,7 +8,7 @@ An Android application that displays upcoming movies fetched from [The Movie Dat
 
 The app allows users to:
 - Browse a list of upcoming theatrical releases sorted by release date and rating.
-- See the movie poster, title, release date (BR locale), and rating at a glance.
+- See the movie poster, title, release date, and rating at a glance.
 - Identify unreleased movies with a dynamic countdown ("Release in X days").
 - Tap a movie to open a detail screen with backdrop, tagline, genres, overview, runtime, and status.
 - Use the app offline — the list is cached locally and served from the database while a background refresh runs.
@@ -32,161 +32,100 @@ The app allows users to:
 
 ---
 
-## Architecture
+## Component pattern
 
-The project follows **Clean Architecture** with a **feature-first** package structure. All layers live inside the `:app` module, organised by feature rather than by layer type.
+Every UI component follows a four-part pattern:
 
-### Package structure
+- **`XxxParams`** — public data class holding all inputs (domain models or primitives).
+- **`XxxComponent`** — public entry point. Owns all mapping logic: constructs URLs, resolves `stringResource`, formats values. Delegates to content.
+- **`XxxComponentContent`** — private composable. Receives only flat primitives and strings — no domain models, no resource lookups.
+- **`XxxPreviewProvider`** — `PreviewParameterProvider<XxxParams>` with representative sample data.
 
-```
-com.example.upcomingmovies
-├── feature/
-│   ├── core/                          # Cross-feature utilities
-│   │   ├── extensions/
-│   │   │   ├── ComponentPreview.kt    # Custom @Preview annotation
-│   │   │   └── DateExtensions.kt     # formatToBrDate, daysUntilRelease, formatRuntime …
-│   │   └── ui/
-│   │       ├── AppNavigation.kt       # NavHost — owns the back stack
-│   │       ├── MainActivity.kt
-│   │       └── UpcomingMoviesApp.kt   # Koin initialisation
-│   │
-│   ├── movielist/                     # Movie list feature
-│   │   ├── data/
-│   │   │   ├── local/                 # Room entity, DAO, AppDatabase
-│   │   │   ├── remote/                # Retrofit DTO + MovieService
-│   │   │   ├── mapper/                # DTO → Entity, Entity → Domain
-│   │   │   └── repository/            # MovieRepositoryImpl
-│   │   ├── domain/
-│   │   │   ├── model/                 # Movie (domain model)
-│   │   │   ├── repository/            # MovieRepository (interface)
-│   │   │   └── usecase/               # ObserveMoviesUseCase, RefreshMoviesUseCase
-│   │   ├── di/
-│   │   │   └── MovieListModule.kt     # Koin module (DB, network, repo, VM)
-│   │   └── presentation/
-│   │       ├── viewmodel/             # MovieListState, MovieListAction, MovieListViewModel
-│   │       ├── components/            # MovieItem, MovieList, LoadingContent, ErrorContent
-│   │       ├── MovieListScreen.kt     # Route + Screen composables
-│   │       └── MovieListPreviewProvider.kt
-│   │
-│   └── moviedetails/                  # Movie detail feature
-│       ├── data/
-│       │   ├── remote/                # Retrofit DTO + MovieDetailService
-│       │   ├── mapper/                # DTO → Domain
-│       │   └── repository/            # MovieDetailRepositoryImpl
-│       ├── domain/
-│       │   ├── model/                 # MovieDetail (domain model)
-│       │   ├── repository/            # MovieDetailRepository (interface)
-│       │   └── usecase/               # GetMovieDetailUseCase
-│       ├── di/
-│       │   └── MovieDetailModule.kt   # Koin module (service, repo, usecase, VM)
-│       └── presentation/
-│           ├── viewmodel/             # MovieDetailState, MovieDetailAction, MovieDetailViewModel
-│           ├── components/            # MovieDetailHeader, MovieDetailGenres, MovieDetailInfo
-│           ├── MovieDetailScreen.kt   # Route + Screen composables
-│           └── MovieDetailPreviewProvider.kt
-```
-
-### Layers
+Each component lives in its own sub-package under `presentation/components/`:
 
 ```
-UI (Compose)
-    │  collects StateFlow, dispatches Actions
-    ▼
-ViewModel
-    │  calls use cases, exposes sealed State
-    ▼
-Use Case  (domain — no Android deps)
-    │  delegates to repository interface
-    ▼
-Repository (interface in domain, impl in data)
-    │
-    ├──▶ LocalDataSource  (Room / DAO)   ← SSOT for movie list
-    └──▶ RemoteDataSource (Retrofit)     ← sync input
+components/
+├── error/
+│   ├── ErrorComponent.kt
+│   └── ErrorComponentPreviewProvider.kt
+├── loading/
+│   └── LoadingComponent.kt
+├── movieitem/
+│   ├── MovieItemComponent.kt       # resolves MovieStatus (Rated / ReleaseStatus)
+│   └── MovieItemPreviewProvider.kt
+└── movielist/
+    ├── MovieListComponent.kt
+    └── MovieListPreviewProvider.kt
 ```
 
-### Offline-first (movie list)
+The `moviedetails` feature follows the same layout under its own `components/` folder (`moviedetailheader/`, `moviedetailinfo/`, `moviedetailgenres/`).
 
-The movie list is **offline-first**: Room is the single source of truth.
+### MovieStatus
 
-1. `MovieListViewModel` collects `ObserveMoviesUseCase` — a `Flow` backed by Room — so the UI always renders from the local database.
-2. On launch (and on retry) `RefreshMoviesUseCase` fetches from the TMDB API and upserts results into Room.
-3. Room emits the updated list through the `Flow`, which the ViewModel picks up automatically.
-4. If the network call fails while the database already has data, the cached list stays visible and no error is shown.
-
-The movie detail screen does **not** cache locally — it is a one-shot `suspend` call that fetches on demand.
-
-### State & Action pattern
-
-Every screen uses a `sealed class` for state and a `sealed class` for actions (MVI-lite):
+`MovieItemComponent` uses a private sealed interface to make the rating / release-status distinction compile-safe:
 
 ```kotlin
-// Example — movie list
+private sealed interface MovieStatus {
+    data class Rated(val rating: String) : MovieStatus
+    data class ReleaseStatus(val text: String) : MovieStatus
+}
+```
+
+The `when` in the content function is exhaustive — adding a new subtype without handling it is a compile error.
+
+---
+
+## State
+
+Each screen uses a `sealed class` for state and a `sealed class` for actions:
+
+```kotlin
 sealed class MovieListState {
     data object Loading : MovieListState()
-    data class Success(val movies: List<Movie>) : MovieListState()
-    data class Error(val message: String) : MovieListState()
-}
-
-sealed class MovieListAction {
-    data object Refresh : MovieListAction()
-    data object RetryLoad : MovieListAction()
+    data object Empty   : MovieListState()
+    data class  Success(val movies: List<Movie>) : MovieListState()
+    data class  Error(val message: String? = null) : MovieListState()
 }
 ```
 
-The ViewModel exposes a single `StateFlow<State>` and a single `onAction(Action)` entry point. Composables observe the state and forward user events as actions.
-
-### Dependency injection (Koin)
-
-Each feature owns a single Koin module that wires its entire vertical slice:
-
-```kotlin
-val movieListModule = module {
-    // Database
-    single { Room.databaseBuilder().build() }
-    single { get<AppDatabase>().movieDao() }
-    // Network
-    single { OkHttpClient.Builder() }
-    single { Retrofit.Builder() }
-    single { get<Retrofit>().create(MovieService::class.java) }
-    // Domain
-    single<MovieRepository> { MovieRepositoryImpl(get(), get()) }
-    factory { ObserveMoviesUseCase(get()) }
-    factory { RefreshMoviesUseCase(get()) }
-    // Presentation
-    viewModel { MovieListViewModel(get(), get()) }
-}
-```
-
-### Navigation
-
-`AppNavigation.kt` owns a `NavHost` with two string routes:
-
-| Route | Screen |
-|---|---|
-| `movie_list` | `MovieListRoute` |
-| `movie_detail/{movieId}` | `MovieDetailRoute` |
-
-`MovieDetailViewModel` receives `movieId` as a constructor parameter via Koin's `parametersOf`.
+`Empty` is emitted by the ViewModel (not the UI) when the observe flow returns an empty list after a prior `Success` or `Empty` state, keeping the UI free of list-size checks.
 
 ---
 
-## Setup
+## Testing
 
-1. Clone the repository.
-2. Obtain a **TMDB API Read Access Token** from [themoviedb.org/settings/api](https://www.themoviedb.org/settings/api).
-3. Open `feature/movielist/di/MovieListModule.kt` and replace the `TMDB_ACCESS_TOKEN` constant with your token.
-4. Build and run.
+### Unit tests — `src/test/`
 
-> The token is a JWT (Bearer auth). Do **not** commit it to source control — consider moving it to `local.properties` and reading it via `BuildConfig` before sharing the project.
+Dependencies: **JUnit 4 · MockK · kotlinx-coroutines-test · Turbine**
 
----
-
-## API Reference
-
-| Endpoint | Used for |
+| File | What it covers |
 |---|---|
-| `GET /movie/upcoming` | Upcoming movie list |
-| `GET /movie/{movie_id}` | Movie detail |
+| `DateExtensionsTest` | `formatToDefaultDate`, `daysUntilRelease` — valid input, invalid format, past/future |
+| `MovieMapperTest` | `MovieDto → MovieEntity → Movie` round-trip, null poster path |
+| `MovieDetailMapperTest` | `MovieDetailDto → MovieDetail`, genres list, null runtime/paths |
+| `ObserveMoviesUseCaseTest` | Delegates to repository, returns exact flow |
+| `RefreshMoviesUseCaseTest` | Delegates to repository, propagates exception |
+| `GetMovieDetailUseCaseTest` | Delegates with correct ID, propagates exception |
+| `MovieRepositoryImplTest` | Flow mapping, empty list, multi-entity, refresh upserts, service error |
+| `MovieDetailRepositoryImplTest` | Maps correctly, null runtime, service error |
+| `MovieListViewModelTest` | All state transitions: Loading → Success / Empty / Error, error suppression on Success, RetryLoad, Refresh |
+| `MovieDetailViewModelTest` | Loading → Success / Error, null message, RetryLoad sequence, NavigateBack no-op |
 
-Base URL: `https://api.themoviedb.org/3/`  
-Image base URL: `https://image.tmdb.org/t/p/{size}{path}`
+ViewModels are tested with `MainDispatcherRule` (replaces `Dispatchers.Main` with `StandardTestDispatcher`) and `MutableSharedFlow` to drive the observe stream.
+
+### Instrumented tests — `src/androidTest/`
+
+Dependencies: **Compose UI Test (ui-test-junit4 · ui-test-manifest)**
+
+| File | What it covers |
+|---|---|
+| `ErrorComponentTest` | Message displayed, retry text, clicking retry triggers callback |
+| `LoadingComponentTest` | Indeterminate progress indicator present |
+| `MovieItemComponentTest` | Title/date/★/rating for rated movie; no ★ + "Already released" for past unrated; click triggers callback |
+| `MovieListComponentTest` | All titles visible, click delivers correct movie ID, empty list |
+| `MovieDetailGenresComponentTest` | Each genre chip rendered, single genre, empty list |
+| `MovieDetailInfoComponentTest` | All info cell labels, rating value, N/A for unrated, runtime formatting (h/m and m-only), null runtime, date and status |
+| `MovieDetailHeaderComponentTest` | Title, quoted tagline, blank tagline hidden, back button visible and clickable |
+| `MovieDaoTest` | Empty DB, insert and observe, `ORDER BY releaseDate DESC` sort, `voteAverage DESC` tiebreak, `REPLACE` conflict strategy, batch insert, empty upsert |
+
+`MovieDaoTest` uses `Room.inMemoryDatabaseBuilder` with `allowMainThreadQueries()` to test real SQL query behaviour including ordering and conflict resolution.
