@@ -30,6 +30,7 @@ import com.example.upcomingmovies.feature.core.domain.ComponentPreview
 import com.example.upcomingmovies.feature.core.domain.daysUntilRelease
 import com.example.upcomingmovies.feature.core.domain.formatToDefaultDate
 import com.example.upcomingmovies.feature.movielist.domain.model.Movie
+import java.util.Locale
 
 private const val POSTER_BASE_URL = "https://image.tmdb.org/t/p/w185"
 private const val ONE_DAY = 1L
@@ -49,7 +50,7 @@ internal data class MovieItemParams(
 internal fun MovieItemComponent(params: MovieItemParams, modifier: Modifier = Modifier) {
     val movie = params.movie
     val status: MovieStatus = if (movie.voteAverage != 0.0) {
-        MovieStatus.Rated("%.1f".format(movie.voteAverage))
+        MovieStatus.Rated(String.format(Locale.US, "%.1f", movie.voteAverage))
     } else {
         MovieStatus.ReleaseStatus(
             when (val days = movie.releaseDate.daysUntilRelease()) {
