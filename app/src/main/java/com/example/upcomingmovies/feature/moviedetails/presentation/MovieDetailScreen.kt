@@ -11,8 +11,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.upcomingmovies.R
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import com.example.upcomingmovies.feature.core.domain.ComponentPreview
 import com.example.upcomingmovies.feature.moviedetails.domain.model.MovieDetail
@@ -97,7 +99,7 @@ private fun MovieDetailContent(
             item {
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
-                    text = "Overview",
+                    text = stringResource(R.string.label_overview),
                     style = MaterialTheme.typography.titleMedium,
                     modifier = Modifier.padding(horizontal = 16.dp),
                 )

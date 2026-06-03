@@ -11,7 +11,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.upcomingmovies.R
 import com.example.upcomingmovies.feature.movielist.presentation.components.ErrorContent
 import com.example.upcomingmovies.feature.movielist.presentation.components.LoadingContent
 import com.example.upcomingmovies.feature.movielist.presentation.components.MovieList
@@ -45,14 +47,14 @@ internal fun MovieListScreen(
     modifier: Modifier = Modifier,
 ) {
     Scaffold(
-        topBar = { TopAppBar(title = { Text("Upcoming Movies") }) },
+        topBar = { TopAppBar(title = { Text(stringResource(R.string.title_upcoming_movies)) }) },
         modifier = modifier,
     ) { innerPadding ->
         when (state) {
             is MovieListState.Loading -> LoadingContent(Modifier.padding(innerPadding))
             is MovieListState.Success -> if (state.movies.isEmpty()) {
                 ErrorContent(
-                    message = "No upcoming movies available.",
+                    message = stringResource(R.string.error_no_upcoming_movies),
                     onRetry = { onAction(MovieListAction.RetryLoad) },
                     modifier = Modifier.padding(innerPadding),
                 )

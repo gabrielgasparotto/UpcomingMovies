@@ -5,37 +5,29 @@ import java.util.Calendar
 import java.util.Locale
 import java.util.concurrent.TimeUnit
 
-private val inputDateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.US)
-private val outputDateFormat = SimpleDateFormat("dd/MMM/yyyy", Locale("pt", "BR"))
+const val US_DATE_FORMAT = "yyyy-MM-dd"
+const val DEFAULT_DATE_FORMAT = "dd/MM/yyyy"
+const val DEFAULT_VALUE = 0
 
-internal fun String.formatToBrDate(): String = try {
+private val inputDateFormat = SimpleDateFormat(US_DATE_FORMAT, Locale.US)
+private val outputDateFormat: SimpleDateFormat
+    get() = SimpleDateFormat(DEFAULT_DATE_FORMAT, Locale.getDefault())
+
+internal fun String.formatToDefaultDate(): String = try {
     inputDateFormat.parse(this)?.let { outputDateFormat.format(it) } ?: this
 } catch (e: Exception) {
-    this
+    throw IllegalArgumentException("Invalid date format: $this. Expected format: $US_DATE_FORMAT", e)
 }
 
 internal fun String.daysUntilRelease(): Long = try {
     val releaseMs = inputDateFormat.parse(this)?.time ?: return 0L
     val todayMs = Calendar.getInstance().apply {
-        set(Calendar.HOUR_OF_DAY, 0)
-        set(Calendar.MINUTE, 0)
-        set(Calendar.SECOND, 0)
-        set(Calendar.MILLISECOND, 0)
+        set(Calendar.HOUR_OF_DAY, DEFAULT_VALUE)
+        set(Calendar.MINUTE, DEFAULT_VALUE)
+        set(Calendar.SECOND, DEFAULT_VALUE)
+        set(Calendar.MILLISECOND, DEFAULT_VALUE)
     }.timeInMillis
     TimeUnit.MILLISECONDS.toDays(releaseMs - todayMs)
 } catch (e: Exception) {
-    0L
-}
-
-internal fun Long.toReleaseLabel(): String = when {
-    this > 1 -> "Release in $this days"
-    this == 1L -> "Release in 1 day"
-    this == 0L -> "Releasing today"
-    else -> "No ratings yet"
-}
-
-internal fun Int.formatRuntime(): String {
-    val hours = this / 60
-    val minutes = this % 60
-    return if (hours > 0) "${hours}h ${minutes}m" else "${minutes}m"
+    throw IllegalArgumentException("Invalid date format: $this. Expected format: $US_DATE_FORMAT", e)
 }

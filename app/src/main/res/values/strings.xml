@@ -1,3 +1,30 @@
 <resources>
     <string name="app_name">UpcomingMovies</string>
+
+    <!-- Movie list -->
+    <string name="title_upcoming_movies">Upcoming Movies</string>
+    <string name="error_no_upcoming_movies">No upcoming movies available.</string>
+    <string name="action_retry">Retry</string>
+
+    <!-- Release countdown labels -->
+    <string name="release_in_days">Release in %d days</string>
+    <string name="release_in_one_day">Release in 1 day</string>
+    <string name="releasing_today">Releasing today</string>
+    <string name="already_released">Already released</string>
+
+    <!-- Runtime format -->
+    <string name="runtime_hours_minutes">%1$dh %2$dm</string>
+    <string name="runtime_minutes">%dm</string>
+
+    <!-- Movie detail info -->
+    <string name="label_rating">Rating</string>
+    <string name="label_runtime">Runtime</string>
+    <string name="label_release">Release</string>
+    <string name="label_status">Status</string>
+    <string name="rating_value">★ %1$.1f\n(%2$d)</string>
+    <string name="not_available">N/A</string>
+    <string name="label_overview">Overview</string>
+
+    <!-- Content descriptions -->
+    <string name="cd_navigate_back">Navigate back</string>
 </resources>

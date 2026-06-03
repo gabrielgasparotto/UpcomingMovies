@@ -15,9 +15,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
+import com.example.upcomingmovies.R
 import com.example.upcomingmovies.feature.core.domain.ComponentPreview
-import com.example.upcomingmovies.feature.core.domain.formatRuntime
-import com.example.upcomingmovies.feature.core.domain.formatToBrDate
+import com.example.upcomingmovies.feature.core.domain.formatToDefaultDate
+
+private const val MINUTES_PER_HOUR = 60
 
 @Composable
 internal fun MovieDetailInfo(
@@ -37,13 +40,22 @@ internal fun MovieDetailInfo(
         ) {
             val hasRating = voteAverage != 0.0
             InfoCell(
-                label = "Rating",
-                value = if (hasRating) "★ ${"%.1f".format(voteAverage)}\n($voteCount)" else "N/A",
+                label = stringResource(R.string.label_rating),
+                value = if (hasRating) stringResource(R.string.rating_value, voteAverage, voteCount)
+                        else stringResource(R.string.not_available),
                 isHighlighted = hasRating,
             )
-            InfoCell(label = "Runtime", value = runtime?.formatRuntime() ?: "N/A")
-            InfoCell(label = "Release", value = releaseDate.formatToBrDate())
-            InfoCell(label = "Status", value = status)
+            InfoCell(
+                label = stringResource(R.string.label_runtime),
+                value = runtime?.let {
+                    val hours = it / MINUTES_PER_HOUR
+                    val minutes = it % MINUTES_PER_HOUR
+                    if (hours > 0) stringResource(R.string.runtime_hours_minutes, hours, minutes)
+                    else stringResource(R.string.runtime_minutes, minutes)
+                } ?: stringResource(R.string.not_available),
+            )
+            InfoCell(label = stringResource(R.string.label_release), value = releaseDate.formatToDefaultDate())
+            InfoCell(label = stringResource(R.string.label_status), value = status)
         }
 
         HorizontalDivider()

@@ -23,16 +23,19 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import androidx.compose.ui.res.stringResource
+import com.example.upcomingmovies.R
 import com.example.upcomingmovies.feature.core.domain.ComponentPreview
 import com.example.upcomingmovies.feature.core.domain.daysUntilRelease
-import com.example.upcomingmovies.feature.core.domain.formatToBrDate
-import com.example.upcomingmovies.feature.core.domain.toReleaseLabel
+import com.example.upcomingmovies.feature.core.domain.formatToDefaultDate
 import com.example.upcomingmovies.feature.movielist.domain.model.Movie
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 
 private const val POSTER_BASE_URL = "https://image.tmdb.org/t/p/w185"
+private const val ONE_DAY = 1L
+private const val TODAY = 0L
 
 @Composable
 internal fun MovieItem(
@@ -69,14 +72,19 @@ internal fun MovieItem(
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
-                text = movie.releaseDate.formatToBrDate(),
+                text = movie.releaseDate.formatToDefaultDate(),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
             Spacer(modifier = Modifier.height(6.dp))
             if (movie.voteAverage == 0.0) {
                 Text(
-                    text = movie.releaseDate.daysUntilRelease().toReleaseLabel(),
+                    text = when (val days = movie.releaseDate.daysUntilRelease()) {
+                        ONE_DAY -> stringResource(R.string.release_in_one_day)
+                        TODAY -> stringResource(R.string.releasing_today)
+                        else -> if (days > ONE_DAY) stringResource(R.string.release_in_days, days)
+                                else stringResource(R.string.already_released)
+                    },
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
