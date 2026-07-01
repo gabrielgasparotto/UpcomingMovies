@@ -3,6 +3,7 @@ package com.example.upcomingmovies.feature.moviedetails.presentation
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import com.example.upcomingmovies.feature.moviedetails.domain.model.MovieDetail
 import com.example.upcomingmovies.feature.moviedetails.presentation.viewmodel.MovieDetailState
+import com.example.upcomingmovies.R
 import kotlinx.collections.immutable.persistentListOf
 
 class MovieDetailStatePreviewProvider : PreviewParameterProvider<MovieDetailState> {
@@ -24,6 +25,6 @@ class MovieDetailStatePreviewProvider : PreviewParameterProvider<MovieDetailStat
                 genres = persistentListOf("Adventure", "Action", "Science Fiction"),
             )
         ),
-        MovieDetailState.Error,
+        MovieDetailState.Error(R.string.error_no_network),
     )
 }

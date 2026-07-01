@@ -9,6 +9,10 @@
     <string name="error_no_upcoming_movies">No upcoming movies available.</string>
     <string name="error_load_movies">Failed to load movies.</string>
     <string name="error_load_movie_details">Failed to load movie details.</string>
+    <string name="error_no_network">No internet connection. Please check your connection and try again.</string>
+    <string name="error_not_found">Content not found.</string>
+    <string name="error_server">Something went wrong on our end. Please try again later.</string>
+    <string name="error_unknown">An unexpected error occurred. Please try again.</string>
     <string name="action_retry">Retry</string>
 
     <!-- Release countdown labels -->

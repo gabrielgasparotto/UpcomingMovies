@@ -94,7 +94,7 @@ internal fun MovieListScreen(
                 is MovieListState.Loading -> LoadingComponent()
                 is MovieListState.Error -> ErrorComponent(
                     params = ErrorComponentParams(
-                        message = stringResource(R.string.error_load_movies),
+                        message = stringResource(state.messageRes),
                         onRetryText = stringResource(R.string.action_retry),
                         onRetry = { onAction(MovieListAction.RetryLoad) },
                     ),

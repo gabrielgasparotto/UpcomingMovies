@@ -2,6 +2,8 @@ package com.example.upcomingmovies.feature.moviedetails.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.upcomingmovies.feature.core.data.MoviesErrorMapper
+import com.example.upcomingmovies.feature.core.presentation.MoviesErrorMessageMapper
 import com.example.upcomingmovies.feature.moviedetails.domain.usecase.GetMovieDetailUseCase
 import com.example.upcomingmovies.feature.movielist.domain.usecase.ObserveHeartedIdsUseCase
 import com.example.upcomingmovies.feature.movielist.domain.usecase.ToggleHeartUseCase
@@ -46,7 +48,7 @@ class MovieDetailViewModel(
             _state.value = MovieDetailState.Loading
             runCatching { getMovieDetailUseCase(movieId) }
                 .onSuccess { _state.value = MovieDetailState.Success(it) }
-                .onFailure { _state.value = MovieDetailState.Error }
+                .onFailure { _state.value = MovieDetailState.Error(MoviesErrorMessageMapper.map(MoviesErrorMapper.map(it))) }
         }
     }
 }

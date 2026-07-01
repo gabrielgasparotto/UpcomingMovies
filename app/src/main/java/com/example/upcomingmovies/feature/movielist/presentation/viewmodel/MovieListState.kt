@@ -1,5 +1,6 @@
 package com.example.upcomingmovies.feature.movielist.presentation.viewmodel
 
+import androidx.annotation.StringRes
 import androidx.compose.runtime.Immutable
 import com.example.upcomingmovies.feature.movielist.domain.model.Movie
 import kotlinx.collections.immutable.ImmutableList
@@ -11,7 +12,7 @@ sealed class MovieListState {
         val allMoviesTab: MovieListTabContent.Movies,
         val favoritesTab: MovieListTabContent,
     ) : MovieListState()
-    data object Error : MovieListState()
+    data class Error(@StringRes val messageRes: Int) : MovieListState()
 }
 
 sealed class MovieListTabContent {

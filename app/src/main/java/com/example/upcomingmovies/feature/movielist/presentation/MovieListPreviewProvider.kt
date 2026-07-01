@@ -4,6 +4,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import com.example.upcomingmovies.feature.movielist.domain.model.Movie
 import com.example.upcomingmovies.feature.movielist.presentation.viewmodel.MovieListState
 import com.example.upcomingmovies.feature.movielist.presentation.viewmodel.MovieListTabContent
+import com.example.upcomingmovies.R
 import kotlinx.collections.immutable.persistentListOf
 
 internal val sampleMovies = persistentListOf(
@@ -20,6 +21,6 @@ class MovieListStatePreviewProvider : PreviewParameterProvider<MovieListState> {
             favoritesTab = MovieListTabContent.Empty,
         ),
         MovieListState.Empty,
-        MovieListState.Error,
+        MovieListState.Error(R.string.error_no_network),
     )
 }

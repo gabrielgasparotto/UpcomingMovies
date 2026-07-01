@@ -2,6 +2,8 @@ package com.example.upcomingmovies.feature.movielist.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.upcomingmovies.feature.core.data.MoviesErrorMapper
+import com.example.upcomingmovies.feature.core.presentation.MoviesErrorMessageMapper
 import com.example.upcomingmovies.feature.movielist.domain.usecase.ObserveHeartedIdsUseCase
 import com.example.upcomingmovies.feature.movielist.domain.usecase.ObserveMoviesUseCase
 import com.example.upcomingmovies.feature.movielist.domain.usecase.RefreshMoviesUseCase
@@ -50,7 +52,7 @@ class MovieListViewModel(
                     _state.value = MovieListState.Success(
                         allMoviesTab = MovieListTabContent.Movies(movies.toImmutableList()),
                         favoritesTab = if (favorites.isEmpty()) MovieListTabContent.Empty
-                                       else MovieListTabContent.Movies(favorites.toImmutableList()),
+                        else MovieListTabContent.Movies(favorites.toImmutableList()),
                     )
                 } else if (current is MovieListState.Success || current is MovieListState.Empty) {
                     _state.value = MovieListState.Empty
@@ -64,7 +66,11 @@ class MovieListViewModel(
             runCatching { refreshMoviesUseCase() }
                 .onFailure {
                     if (_state.value !is MovieListState.Success) {
-                        _state.value = MovieListState.Error
+                        _state.value = MovieListState.Error(
+                            MoviesErrorMessageMapper.map(
+                                MoviesErrorMapper.map(it)
+                            )
+                        )
                     }
                 }
         }

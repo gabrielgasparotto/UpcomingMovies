@@ -84,7 +84,7 @@ internal fun MovieDetailScreen(
                 )
                 is MovieDetailState.Error -> ErrorComponent(
                     params = ErrorComponentParams(
-                        message = stringResource(R.string.error_load_movie_details),
+                        message = stringResource(state.messageRes),
                         onRetryText = stringResource(R.string.action_retry),
                         onRetry = { onAction(MovieDetailAction.RetryLoad) },
                     ),

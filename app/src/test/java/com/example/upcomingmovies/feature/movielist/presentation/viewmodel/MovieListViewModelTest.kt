@@ -1,6 +1,7 @@
 package com.example.upcomingmovies.feature.movielist.presentation.viewmodel
 
 import com.example.upcomingmovies.feature.movielist.domain.model.Movie
+import com.example.upcomingmovies.R
 import com.example.upcomingmovies.feature.movielist.domain.usecase.ObserveHeartedIdsUseCase
 import kotlinx.collections.immutable.toImmutableList
 import com.example.upcomingmovies.feature.movielist.domain.usecase.ObserveMoviesUseCase
@@ -124,14 +125,14 @@ class MovieListViewModelTest {
         coEvery { refreshMoviesUseCase() } throws RuntimeException("error")
         val viewModel = createViewModel()
         advanceUntilIdle()
-        assertEquals(MovieListState.Error, viewModel.state.value)
+        assertEquals(MovieListState.Error(R.string.error_unknown), viewModel.state.value)
 
         // When — observe emits empty list while in Error state
         moviesFlow.emit(emptyList())
         advanceUntilIdle()
 
         // Then — Error is unchanged; empty only triggers Empty when coming from Success/Empty
-        assertEquals(MovieListState.Error, viewModel.state.value)
+        assertEquals(MovieListState.Error(R.string.error_unknown), viewModel.state.value)
     }
 
     @Test
@@ -168,7 +169,7 @@ class MovieListViewModelTest {
         advanceUntilIdle()
 
         // Then
-        assertEquals(MovieListState.Error, viewModel.state.value)
+        assertEquals(MovieListState.Error(R.string.error_unknown), viewModel.state.value)
     }
 
     @Test
@@ -203,7 +204,7 @@ class MovieListViewModelTest {
         advanceUntilIdle()
 
         // Then
-        assertEquals(MovieListState.Error, viewModel.state.value)
+        assertEquals(MovieListState.Error(R.string.error_unknown), viewModel.state.value)
     }
 
     // endregion
@@ -216,7 +217,7 @@ class MovieListViewModelTest {
         coEvery { refreshMoviesUseCase() } throws RuntimeException("error")
         val viewModel = createViewModel()
         advanceUntilIdle()
-        assertEquals(MovieListState.Error, viewModel.state.value)
+        assertEquals(MovieListState.Error(R.string.error_unknown), viewModel.state.value)
 
         // When
         coJustRun { refreshMoviesUseCase() }

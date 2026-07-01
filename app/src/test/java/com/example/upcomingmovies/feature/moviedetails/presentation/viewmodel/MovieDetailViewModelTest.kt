@@ -1,6 +1,7 @@
 package com.example.upcomingmovies.feature.moviedetails.presentation.viewmodel
 
 import app.cash.turbine.test
+import com.example.upcomingmovies.R
 import com.example.upcomingmovies.feature.moviedetails.domain.model.MovieDetail
 import com.example.upcomingmovies.feature.moviedetails.domain.usecase.GetMovieDetailUseCase
 import kotlinx.collections.immutable.persistentListOf
@@ -90,7 +91,7 @@ class MovieDetailViewModelTest {
         advanceUntilIdle()
 
         // Then
-        assertEquals(MovieDetailState.Error, viewModel.state.value)
+        assertEquals(MovieDetailState.Error(R.string.error_unknown), viewModel.state.value)
     }
 
     @Test
@@ -103,7 +104,7 @@ class MovieDetailViewModelTest {
         advanceUntilIdle()
 
         // Then
-        assertEquals(MovieDetailState.Error, viewModel.state.value)
+        assertEquals(MovieDetailState.Error(R.string.error_unknown), viewModel.state.value)
     }
 
     @Test
@@ -137,7 +138,7 @@ class MovieDetailViewModelTest {
 
         // Then — observe Loading → Success via Turbine
         viewModel.state.test {
-            assertEquals(MovieDetailState.Error, awaitItem())
+            assertEquals(MovieDetailState.Error(R.string.error_unknown), awaitItem())
             viewModel.onAction(MovieDetailAction.RetryLoad)
             advanceUntilIdle()
             assertEquals(MovieDetailState.Loading, awaitItem())
