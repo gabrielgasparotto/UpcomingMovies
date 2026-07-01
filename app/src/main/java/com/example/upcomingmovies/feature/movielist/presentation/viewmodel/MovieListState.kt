@@ -12,7 +12,7 @@ sealed class MovieListState {
         val allMoviesTab: MovieListTabContent.Movies,
         val favoritesTab: MovieListTabContent,
     ) : MovieListState()
-    data class Error(@StringRes val messageRes: Int) : MovieListState()
+    data class Error(@param:StringRes val messageRes: Int) : MovieListState()
 }
 
 sealed class MovieListTabContent {
