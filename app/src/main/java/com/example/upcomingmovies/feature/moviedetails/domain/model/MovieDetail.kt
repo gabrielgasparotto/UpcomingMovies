@@ -1,9 +1,7 @@
 package com.example.upcomingmovies.feature.moviedetails.domain.model
 
-import androidx.compose.runtime.Immutable
 import kotlinx.collections.immutable.ImmutableList
 
-@Immutable
 data class MovieDetail(
     val id: Int,
     val title: String,
