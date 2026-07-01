@@ -2,6 +2,8 @@ package com.example.upcomingmovies.feature.moviedetails.presentation.viewmodel
 
 import app.cash.turbine.test
 import com.example.upcomingmovies.R
+import com.example.upcomingmovies.feature.core.domain.MoviesError
+import com.example.upcomingmovies.feature.core.domain.MoviesException
 import com.example.upcomingmovies.feature.moviedetails.domain.model.MovieDetail
 import com.example.upcomingmovies.feature.moviedetails.domain.usecase.GetMovieDetailUseCase
 import kotlinx.collections.immutable.persistentListOf
@@ -84,7 +86,7 @@ class MovieDetailViewModelTest {
     @Test
     fun `loadDetail - failure - state becomes Error`() = runTest {
         // Given
-        coEvery { getMovieDetailUseCase(movieId) } throws RuntimeException("Not found")
+        coEvery { getMovieDetailUseCase(movieId) } throws MoviesException(MoviesError.Unknown)
 
         // When
         val viewModel = createViewModel()
@@ -95,9 +97,9 @@ class MovieDetailViewModelTest {
     }
 
     @Test
-    fun `loadDetail - failure with null message - state becomes Error`() = runTest {
+    fun `loadDetail - failure with Unknown error - state becomes Error with unknown message`() = runTest {
         // Given
-        coEvery { getMovieDetailUseCase(movieId) } throws RuntimeException()
+        coEvery { getMovieDetailUseCase(movieId) } throws MoviesException(MoviesError.Unknown)
 
         // When
         val viewModel = createViewModel()
@@ -128,7 +130,7 @@ class MovieDetailViewModelTest {
     @Test
     fun `retryLoad - transitions through Loading then reaches Success`() = runTest {
         // Given — reach Error state first
-        coEvery { getMovieDetailUseCase(movieId) } throws RuntimeException("error")
+        coEvery { getMovieDetailUseCase(movieId) } throws MoviesException(MoviesError.Unknown)
         val viewModel = createViewModel()
         advanceUntilIdle()
 
@@ -150,7 +152,7 @@ class MovieDetailViewModelTest {
     @Test
     fun `retryLoad - success - state becomes Success`() = runTest {
         // Given — reach Error state
-        coEvery { getMovieDetailUseCase(movieId) } throws RuntimeException("error")
+        coEvery { getMovieDetailUseCase(movieId) } throws MoviesException(MoviesError.Unknown)
         val viewModel = createViewModel()
         advanceUntilIdle()
 
@@ -167,7 +169,7 @@ class MovieDetailViewModelTest {
     @Test
     fun `retryLoad - calls use case again`() = runTest {
         // Given
-        coEvery { getMovieDetailUseCase(movieId) } throws RuntimeException("error")
+        coEvery { getMovieDetailUseCase(movieId) } throws MoviesException(MoviesError.Unknown)
         val viewModel = createViewModel()
         advanceUntilIdle()
 

@@ -2,7 +2,8 @@ package com.example.upcomingmovies.feature.movielist.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.upcomingmovies.feature.core.data.MoviesErrorMapper
+import com.example.upcomingmovies.feature.core.domain.MoviesError
+import com.example.upcomingmovies.feature.core.domain.MoviesException
 import com.example.upcomingmovies.feature.core.presentation.MoviesErrorMessageMapper
 import com.example.upcomingmovies.feature.movielist.domain.usecase.ObserveHeartedIdsUseCase
 import com.example.upcomingmovies.feature.movielist.domain.usecase.ObserveMoviesUseCase
@@ -64,13 +65,10 @@ class MovieListViewModel(
     private fun refresh() {
         viewModelScope.launch {
             runCatching { refreshMoviesUseCase() }
-                .onFailure {
+                .onFailure { throwable ->
                     if (_state.value !is MovieListState.Success) {
-                        _state.value = MovieListState.Error(
-                            MoviesErrorMessageMapper.map(
-                                MoviesErrorMapper.map(it)
-                            )
-                        )
+                        val error = (throwable as? MoviesException)?.error ?: MoviesError.Unknown
+                        _state.value = MovieListState.Error(MoviesErrorMessageMapper.map(error))
                     }
                 }
         }

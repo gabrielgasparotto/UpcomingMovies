@@ -1,5 +1,7 @@
 package com.example.upcomingmovies.feature.movielist.data.repository
 
+import com.example.upcomingmovies.feature.core.data.MoviesErrorMapper
+import com.example.upcomingmovies.feature.core.domain.MoviesException
 import com.example.upcomingmovies.feature.movielist.data.local.MovieDao
 import com.example.upcomingmovies.feature.movielist.data.mapper.toDomain
 import com.example.upcomingmovies.feature.movielist.data.mapper.toEntity
@@ -18,7 +20,9 @@ class MovieRepositoryImpl(
         dao.observeMovies().map { entities -> entities.map { it.toDomain() } }
 
     override suspend fun refresh() {
-        val remote = service.getUpcomingMovies()
-        dao.upsertAll(remote.results.map { it.toEntity() })
+        runCatching {
+            val remote = service.getUpcomingMovies()
+            dao.upsertAll(remote.results.map { it.toEntity() })
+        }.onFailure { throw MoviesException(MoviesErrorMapper.map(it)) }
     }
 }

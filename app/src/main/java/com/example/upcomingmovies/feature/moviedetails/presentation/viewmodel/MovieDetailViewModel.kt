@@ -2,7 +2,8 @@ package com.example.upcomingmovies.feature.moviedetails.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.upcomingmovies.feature.core.data.MoviesErrorMapper
+import com.example.upcomingmovies.feature.core.domain.MoviesError
+import com.example.upcomingmovies.feature.core.domain.MoviesException
 import com.example.upcomingmovies.feature.core.presentation.MoviesErrorMessageMapper
 import com.example.upcomingmovies.feature.moviedetails.domain.usecase.GetMovieDetailUseCase
 import com.example.upcomingmovies.feature.movielist.domain.usecase.ObserveHeartedIdsUseCase
@@ -48,7 +49,10 @@ class MovieDetailViewModel(
             _state.value = MovieDetailState.Loading
             runCatching { getMovieDetailUseCase(movieId) }
                 .onSuccess { _state.value = MovieDetailState.Success(it) }
-                .onFailure { _state.value = MovieDetailState.Error(MoviesErrorMessageMapper.map(MoviesErrorMapper.map(it))) }
+                .onFailure { throwable ->
+                    val error = (throwable as? MoviesException)?.error ?: MoviesError.Unknown
+                    _state.value = MovieDetailState.Error(MoviesErrorMessageMapper.map(error))
+                }
         }
     }
 }

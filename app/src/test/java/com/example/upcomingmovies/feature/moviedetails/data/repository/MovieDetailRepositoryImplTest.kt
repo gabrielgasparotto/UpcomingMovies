@@ -1,15 +1,21 @@
 package com.example.upcomingmovies.feature.moviedetails.data.repository
 
+import com.example.upcomingmovies.feature.core.domain.MoviesError
+import com.example.upcomingmovies.feature.core.domain.MoviesException
 import com.example.upcomingmovies.feature.moviedetails.data.remote.GenreDto
 import com.example.upcomingmovies.feature.moviedetails.data.remote.MovieDetailDto
 import com.example.upcomingmovies.feature.moviedetails.data.remote.MovieDetailService
 import io.mockk.coEvery
 import io.mockk.coVerify
+import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
+import retrofit2.HttpException
+import java.io.IOException
 
 class MovieDetailRepositoryImplTest {
 
@@ -54,16 +60,43 @@ class MovieDetailRepositoryImplTest {
     }
 
     @Test
-    fun `getMovieDetail - service throws - propagates exception`() = runTest {
+    fun `getMovieDetail - service throws IOException - wraps in MoviesException with NoNetwork`() = runTest {
         // Given
-        val error = RuntimeException("Not found")
-        coEvery { service.getMovieDetail(any()) } throws error
+        coEvery { service.getMovieDetail(any()) } throws IOException()
 
         // When
         val thrown = runCatching { repository.getMovieDetail(99) }.exceptionOrNull()
 
         // Then
-        assertEquals(error, thrown)
+        assertTrue(thrown is MoviesException)
+        assertEquals(MoviesError.NoNetwork, (thrown as MoviesException).error)
+    }
+
+    @Test
+    fun `getMovieDetail - service throws HttpException 404 - wraps in MoviesException with NotFound`() = runTest {
+        // Given
+        val httpException = mockk<HttpException> { every { code() } returns 404 }
+        coEvery { service.getMovieDetail(any()) } throws httpException
+
+        // When
+        val thrown = runCatching { repository.getMovieDetail(99) }.exceptionOrNull()
+
+        // Then
+        assertTrue(thrown is MoviesException)
+        assertEquals(MoviesError.NotFound, (thrown as MoviesException).error)
+    }
+
+    @Test
+    fun `getMovieDetail - service throws unknown exception - wraps in MoviesException with Unknown`() = runTest {
+        // Given
+        coEvery { service.getMovieDetail(any()) } throws RuntimeException("unexpected")
+
+        // When
+        val thrown = runCatching { repository.getMovieDetail(99) }.exceptionOrNull()
+
+        // Then
+        assertTrue(thrown is MoviesException)
+        assertEquals(MoviesError.Unknown, (thrown as MoviesException).error)
     }
 }
 

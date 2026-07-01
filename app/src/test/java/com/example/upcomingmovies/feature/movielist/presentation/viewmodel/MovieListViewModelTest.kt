@@ -2,6 +2,8 @@ package com.example.upcomingmovies.feature.movielist.presentation.viewmodel
 
 import com.example.upcomingmovies.feature.movielist.domain.model.Movie
 import com.example.upcomingmovies.R
+import com.example.upcomingmovies.feature.core.domain.MoviesError
+import com.example.upcomingmovies.feature.core.domain.MoviesException
 import com.example.upcomingmovies.feature.movielist.domain.usecase.ObserveHeartedIdsUseCase
 import kotlinx.collections.immutable.toImmutableList
 import com.example.upcomingmovies.feature.movielist.domain.usecase.ObserveMoviesUseCase
@@ -122,7 +124,7 @@ class MovieListViewModelTest {
     @Test
     fun `observeMovies - empty list while Error - state remains Error`() = runTest {
         // Given — reach Error state first
-        coEvery { refreshMoviesUseCase() } throws RuntimeException("error")
+        coEvery { refreshMoviesUseCase() } throws MoviesException(MoviesError.Unknown)
         val viewModel = createViewModel()
         advanceUntilIdle()
         assertEquals(MovieListState.Error(R.string.error_unknown), viewModel.state.value)
@@ -162,7 +164,7 @@ class MovieListViewModelTest {
     @Test
     fun `refresh - fails while Loading - state becomes Error`() = runTest {
         // Given
-        coEvery { refreshMoviesUseCase() } throws RuntimeException("Network error")
+        coEvery { refreshMoviesUseCase() } throws MoviesException(MoviesError.Unknown)
         val viewModel = createViewModel()
 
         // When
@@ -182,7 +184,7 @@ class MovieListViewModelTest {
         advanceUntilIdle()
 
         // When refresh fails after Success
-        coEvery { refreshMoviesUseCase() } throws RuntimeException("Network error")
+        coEvery { refreshMoviesUseCase() } throws MoviesException(MoviesError.Unknown)
         viewModel.onAction(MovieListAction.Refresh)
         advanceUntilIdle()
 
@@ -195,16 +197,16 @@ class MovieListViewModelTest {
     }
 
     @Test
-    fun `refresh - fails with null message - state becomes Error`() = runTest {
+    fun `refresh - fails with NoNetwork error - state becomes Error with no_network message`() = runTest {
         // Given
-        coEvery { refreshMoviesUseCase() } throws RuntimeException()
+        coEvery { refreshMoviesUseCase() } throws MoviesException(MoviesError.NoNetwork)
         val viewModel = createViewModel()
 
         // When
         advanceUntilIdle()
 
         // Then
-        assertEquals(MovieListState.Error(R.string.error_unknown), viewModel.state.value)
+        assertEquals(MovieListState.Error(R.string.error_no_network), viewModel.state.value)
     }
 
     // endregion
@@ -214,7 +216,7 @@ class MovieListViewModelTest {
     @Test
     fun `retryLoad - immediately sets state to Loading`() = runTest {
         // Given — reach Error state
-        coEvery { refreshMoviesUseCase() } throws RuntimeException("error")
+        coEvery { refreshMoviesUseCase() } throws MoviesException(MoviesError.Unknown)
         val viewModel = createViewModel()
         advanceUntilIdle()
         assertEquals(MovieListState.Error(R.string.error_unknown), viewModel.state.value)
@@ -230,7 +232,7 @@ class MovieListViewModelTest {
     @Test
     fun `retryLoad - refresh succeeds - state stays Loading until movies arrive`() = runTest {
         // Given — reach Error state
-        coEvery { refreshMoviesUseCase() } throws RuntimeException("error")
+        coEvery { refreshMoviesUseCase() } throws MoviesException(MoviesError.Unknown)
         val viewModel = createViewModel()
         advanceUntilIdle()
 

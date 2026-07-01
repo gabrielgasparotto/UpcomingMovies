@@ -1,12 +1,15 @@
 package com.example.upcomingmovies.feature.movielist.data.repository
 
 import app.cash.turbine.test
+import com.example.upcomingmovies.feature.core.domain.MoviesError
+import com.example.upcomingmovies.feature.core.domain.MoviesException
 import com.example.upcomingmovies.feature.movielist.data.local.MovieDao
 import com.example.upcomingmovies.feature.movielist.data.local.MovieEntity
 import com.example.upcomingmovies.feature.movielist.data.remote.MovieDto
 import com.example.upcomingmovies.feature.movielist.data.remote.MovieService
 import com.example.upcomingmovies.feature.movielist.data.remote.UpcomingMoviesResponse
 import com.example.upcomingmovies.feature.movielist.domain.model.Movie
+import io.mockk.coEvery
 import io.mockk.coJustRun
 import io.mockk.coVerify
 import io.mockk.every
@@ -15,7 +18,9 @@ import io.mockk.slot
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Test
+import java.io.IOException
 
 class MovieRepositoryImplTest {
 
@@ -82,7 +87,7 @@ class MovieRepositoryImplTest {
         // Given
         val dto = buildMovieDto()
         val response = UpcomingMoviesResponse(page = 1, results = listOf(dto), totalPages = 1, totalResults = 1)
-        io.mockk.coEvery { service.getUpcomingMovies() } returns response
+        coEvery { service.getUpcomingMovies() } returns response
         coJustRun { dao.upsertAll(any()) }
         val capturedEntities = slot<List<MovieEntity>>()
 
@@ -105,7 +110,7 @@ class MovieRepositoryImplTest {
     fun `refresh - empty results - upserts empty list`() = runTest {
         // Given
         val response = UpcomingMoviesResponse(page = 1, results = emptyList(), totalPages = 0, totalResults = 0)
-        io.mockk.coEvery { service.getUpcomingMovies() } returns response
+        coEvery { service.getUpcomingMovies() } returns response
         coJustRun { dao.upsertAll(any()) }
 
         // When
@@ -116,16 +121,29 @@ class MovieRepositoryImplTest {
     }
 
     @Test
-    fun `refresh - service throws - propagates exception`() = runTest {
+    fun `refresh - service throws IOException - wraps in MoviesException with NoNetwork`() = runTest {
         // Given
-        val error = RuntimeException("Network error")
-        io.mockk.coEvery { service.getUpcomingMovies() } throws error
+        coEvery { service.getUpcomingMovies() } throws IOException()
 
         // When
         val thrown = runCatching { repository.refresh() }.exceptionOrNull()
 
         // Then
-        assertEquals(error, thrown)
+        assertTrue(thrown is MoviesException)
+        assertEquals(MoviesError.NoNetwork, (thrown as MoviesException).error)
+    }
+
+    @Test
+    fun `refresh - service throws unknown exception - wraps in MoviesException with Unknown`() = runTest {
+        // Given
+        coEvery { service.getUpcomingMovies() } throws RuntimeException("unexpected")
+
+        // When
+        val thrown = runCatching { repository.refresh() }.exceptionOrNull()
+
+        // Then
+        assertTrue(thrown is MoviesException)
+        assertEquals(MoviesError.Unknown, (thrown as MoviesException).error)
     }
 
     // endregion
