@@ -2,6 +2,7 @@ package com.example.upcomingmovies.feature.movielist.presentation.viewmodel
 
 import com.example.upcomingmovies.feature.movielist.domain.model.Movie
 import com.example.upcomingmovies.feature.movielist.domain.usecase.ObserveHeartedIdsUseCase
+import kotlinx.collections.immutable.toImmutableList
 import com.example.upcomingmovies.feature.movielist.domain.usecase.ObserveMoviesUseCase
 import com.example.upcomingmovies.feature.movielist.domain.usecase.RefreshMoviesUseCase
 import com.example.upcomingmovies.utils.MainDispatcherRule
@@ -75,7 +76,7 @@ class MovieListViewModelTest {
 
         // Then — allMoviesTab contains all movies, favoritesTab is Empty (no hearted movies)
         val expected = MovieListState.Success(
-            allMoviesTab = MovieListTabContent.Movies(movies),
+            allMoviesTab = MovieListTabContent.Movies(movies.toImmutableList()),
             favoritesTab = MovieListTabContent.Empty,
         )
         assertEquals(expected, viewModel.state.value)
@@ -104,7 +105,7 @@ class MovieListViewModelTest {
         moviesFlow.emit(movies)
         advanceUntilIdle()
         val expected = MovieListState.Success(
-            allMoviesTab = MovieListTabContent.Movies(movies),
+            allMoviesTab = MovieListTabContent.Movies(movies.toImmutableList()),
             favoritesTab = MovieListTabContent.Empty,
         )
         assertEquals(expected, viewModel.state.value)
@@ -186,7 +187,7 @@ class MovieListViewModelTest {
 
         // Then — error is suppressed because state is Success
         val expected = MovieListState.Success(
-            allMoviesTab = MovieListTabContent.Movies(movies),
+            allMoviesTab = MovieListTabContent.Movies(movies.toImmutableList()),
             favoritesTab = MovieListTabContent.Empty,
         )
         assertEquals(expected, viewModel.state.value)

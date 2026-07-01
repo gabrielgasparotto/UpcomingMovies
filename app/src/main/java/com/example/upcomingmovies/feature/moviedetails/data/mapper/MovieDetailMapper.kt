@@ -2,6 +2,7 @@ package com.example.upcomingmovies.feature.moviedetails.data.mapper
 
 import com.example.upcomingmovies.feature.moviedetails.data.remote.MovieDetailDto
 import com.example.upcomingmovies.feature.moviedetails.domain.model.MovieDetail
+import kotlinx.collections.immutable.toImmutableList
 
 internal fun MovieDetailDto.toDomain(): MovieDetail = MovieDetail(
     id = id,
@@ -15,5 +16,5 @@ internal fun MovieDetailDto.toDomain(): MovieDetail = MovieDetail(
     voteCount = voteCount,
     posterPath = posterPath,
     backdropPath = backdropPath,
-    genres = genres.map { it.name },
+    genres = genres.map { it.name }.toImmutableList(),
 )

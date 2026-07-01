@@ -9,11 +9,14 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.runtime.Stable
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import com.example.upcomingmovies.feature.core.domain.ComponentPreview
+import kotlinx.collections.immutable.ImmutableList
 
-internal data class MovieDetailGenresParams(val genres: List<String>)
+@Stable
+internal data class MovieDetailGenresParams(val genres: ImmutableList<String>)
 
 @Composable
 internal fun MovieDetailGenresComponent(params: MovieDetailGenresParams, modifier: Modifier = Modifier) {

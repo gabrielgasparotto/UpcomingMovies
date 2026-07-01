@@ -8,15 +8,18 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.runtime.Stable
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import com.example.upcomingmovies.feature.core.domain.ComponentPreview
 import com.example.upcomingmovies.feature.movielist.domain.model.Movie
 import com.example.upcomingmovies.feature.movielist.presentation.components.movieitem.MovieItemComponent
 import com.example.upcomingmovies.feature.movielist.presentation.components.movieitem.MovieItemParams
+import kotlinx.collections.immutable.ImmutableList
 
+@Stable
 internal data class MovieListParams(
-    val movies: List<Movie>,
+    val movies: ImmutableList<Movie>,
     val onMovieClick: (Int) -> Unit,
 )
 

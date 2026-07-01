@@ -8,12 +8,14 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import com.example.upcomingmovies.feature.core.domain.ComponentPreview
 
+@Stable
 internal data class ErrorComponentParams(
     val message: String,
     val onRetryText: String?,

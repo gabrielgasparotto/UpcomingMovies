@@ -1,5 +1,6 @@
 package com.example.upcomingmovies.feature.moviedetails.presentation.components.moviedetailheader
 
+import androidx.compose.runtime.Stable
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -40,6 +41,7 @@ import com.example.upcomingmovies.feature.moviedetails.domain.model.MovieDetail
 
 private val HeartedColor = Color(0xFFE91E63)
 
+@Stable
 internal data class MovieDetailHeaderParams(
     val movie: MovieDetail,
     val isHearted: Boolean,

@@ -24,6 +24,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.runtime.Stable
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
@@ -45,6 +46,7 @@ private sealed interface MovieStatus {
     data class ReleaseStatus(val text: String) : MovieStatus
 }
 
+@Stable
 internal data class MovieItemParams(
     val movie: Movie,
     val onClick: () -> Unit,

@@ -3,6 +3,7 @@ package com.example.upcomingmovies.feature.moviedetails.presentation
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import com.example.upcomingmovies.feature.moviedetails.domain.model.MovieDetail
 import com.example.upcomingmovies.feature.moviedetails.presentation.viewmodel.MovieDetailState
+import kotlinx.collections.immutable.persistentListOf
 
 class MovieDetailStatePreviewProvider : PreviewParameterProvider<MovieDetailState> {
     override val values = sequenceOf(
@@ -20,7 +21,7 @@ class MovieDetailStatePreviewProvider : PreviewParameterProvider<MovieDetailStat
                 voteCount = 22061,
                 posterPath = "/6FfCtAuVAW8XJjZ7eWeLibRLWTw.jpg",
                 backdropPath = "/2w4xG178RpB4MDAIfTkqAuSJzec.jpg",
-                genres = listOf("Adventure", "Action", "Science Fiction"),
+                genres = persistentListOf("Adventure", "Action", "Science Fiction"),
             )
         ),
         MovieDetailState.Error,

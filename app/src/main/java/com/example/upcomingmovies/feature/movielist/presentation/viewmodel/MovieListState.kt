@@ -1,6 +1,8 @@
 package com.example.upcomingmovies.feature.movielist.presentation.viewmodel
 
+import androidx.compose.runtime.Immutable
 import com.example.upcomingmovies.feature.movielist.domain.model.Movie
+import kotlinx.collections.immutable.ImmutableList
 
 sealed class MovieListState {
     data object Loading : MovieListState()
@@ -13,6 +15,7 @@ sealed class MovieListState {
 }
 
 sealed class MovieListTabContent {
-    data class Movies(val movies: List<Movie>) : MovieListTabContent()
+    @Immutable
+    data class Movies(val movies: ImmutableList<Movie>) : MovieListTabContent()
     data object Empty : MovieListTabContent()
 }

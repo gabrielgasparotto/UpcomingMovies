@@ -90,6 +90,9 @@ dependencies {
     // Navigation
     implementation(libs.androidx.navigation.compose)
 
+    // Immutable collections
+    implementation(libs.kotlinx.collections.immutable)
+
     // Compose UI tests
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)

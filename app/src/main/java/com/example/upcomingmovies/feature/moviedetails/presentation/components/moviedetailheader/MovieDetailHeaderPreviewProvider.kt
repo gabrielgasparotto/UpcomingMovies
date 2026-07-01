@@ -2,6 +2,7 @@ package com.example.upcomingmovies.feature.moviedetails.presentation.components.
 
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import com.example.upcomingmovies.feature.moviedetails.domain.model.MovieDetail
+import kotlinx.collections.immutable.persistentListOf
 
 internal class MovieDetailHeaderPreviewProvider : PreviewParameterProvider<MovieDetailHeaderParams> {
     override val values = sequenceOf(
@@ -18,7 +19,7 @@ internal class MovieDetailHeaderPreviewProvider : PreviewParameterProvider<Movie
                 voteCount = 22061,
                 posterPath = "/6FfCtAuVAW8XJjZ7eWeLibRLWTw.jpg",
                 backdropPath = "/2w4xG178RpB4MDAIfTkqAuSJzec.jpg",
-                genres = listOf("Adventure", "Action", "Science Fiction"),
+                genres = persistentListOf("Adventure", "Action", "Science Fiction"),
             ),
             isHearted = false,
             onBackClick = {},
@@ -37,7 +38,7 @@ internal class MovieDetailHeaderPreviewProvider : PreviewParameterProvider<Movie
                 voteCount = 22061,
                 posterPath = "/6FfCtAuVAW8XJjZ7eWeLibRLWTw.jpg",
                 backdropPath = "/2w4xG178RpB4MDAIfTkqAuSJzec.jpg",
-                genres = listOf("Adventure", "Action", "Science Fiction"),
+                genres = persistentListOf("Adventure", "Action", "Science Fiction"),
             ),
             isHearted = true,
             onBackClick = {},

@@ -9,6 +9,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -23,6 +24,7 @@ import com.example.upcomingmovies.feature.core.domain.formatToDefaultDate
 
 private const val MINUTES_PER_HOUR = 60
 
+@Immutable
 internal data class MovieDetailInfoParams(
     val voteAverage: Double,
     val voteCount: Int,

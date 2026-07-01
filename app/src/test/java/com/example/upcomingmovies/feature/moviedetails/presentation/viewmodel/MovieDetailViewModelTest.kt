@@ -3,6 +3,7 @@ package com.example.upcomingmovies.feature.moviedetails.presentation.viewmodel
 import app.cash.turbine.test
 import com.example.upcomingmovies.feature.moviedetails.domain.model.MovieDetail
 import com.example.upcomingmovies.feature.moviedetails.domain.usecase.GetMovieDetailUseCase
+import kotlinx.collections.immutable.persistentListOf
 import com.example.upcomingmovies.feature.movielist.domain.usecase.ObserveHeartedIdsUseCase
 import com.example.upcomingmovies.feature.movielist.domain.usecase.ToggleHeartUseCase
 import com.example.upcomingmovies.utils.MainDispatcherRule
@@ -276,5 +277,5 @@ private fun buildMovieDetail(id: Int = 11) = MovieDetail(
     voteCount = 22061,
     posterPath = "/poster.jpg",
     backdropPath = "/backdrop.jpg",
-    genres = listOf("Adventure", "Action"),
+    genres = persistentListOf("Adventure", "Action"),
 )

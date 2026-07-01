@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.upcomingmovies.feature.movielist.domain.usecase.ObserveHeartedIdsUseCase
 import com.example.upcomingmovies.feature.movielist.domain.usecase.ObserveMoviesUseCase
 import com.example.upcomingmovies.feature.movielist.domain.usecase.RefreshMoviesUseCase
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -47,9 +48,9 @@ class MovieListViewModel(
                 if (movies.isNotEmpty()) {
                     val favorites = movies.filter { it.isHearted }
                     _state.value = MovieListState.Success(
-                        allMoviesTab = MovieListTabContent.Movies(movies),
+                        allMoviesTab = MovieListTabContent.Movies(movies.toImmutableList()),
                         favoritesTab = if (favorites.isEmpty()) MovieListTabContent.Empty
-                                       else MovieListTabContent.Movies(favorites),
+                                       else MovieListTabContent.Movies(favorites.toImmutableList()),
                     )
                 } else if (current is MovieListState.Success || current is MovieListState.Empty) {
                     _state.value = MovieListState.Empty

@@ -29,6 +29,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
+import androidx.compose.runtime.Stable
 import com.example.upcomingmovies.R
 import com.example.upcomingmovies.feature.core.domain.ComponentPreview
 
@@ -38,6 +39,7 @@ private val TabSelected = Color.White
 private val TabUnselected = Color.White.copy(alpha = 0.55f)
 private val TabIndicator = Color(0xFFE040FB)
 
+@Stable
 internal data class MovieListTopBarParams(
     val selectedTabIndex: Int,
     val onTabSelected: (Int) -> Unit,
